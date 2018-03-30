@@ -1,0 +1,21 @@
+hash: d06eab065966c1c521389d0e0b50922c4bcf9f0066d7fd522ee8ea3ae641480a
+updated: 2018-03-30T17:03:17.811513+02:00
+imports:
+- name: github.com/AlecAivazis/survey
+  version: 9d3458c219bae9653d267883634bdb5375281fd8
+- name: github.com/mattn/go-colorable
+  version: efa589957cd060542a26d2dd7832fd6a6c6c3ade
+- name: github.com/mattn/go-isatty
+  version: 6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c
+- name: github.com/mgutz/ansi
+  version: 9520e82c474b0a04dd04f8a40959027271bab992
+- name: golang.org/x/sys
+  version: 378d26f46672a356c46195c28f61bdb4c0a781dd
+  subpackages:
+  - unix
+- name: gopkg.in/AlecAivazis/survey.v1
+  version: 9d3458c219bae9653d267883634bdb5375281fd8
+  subpackages:
+  - core
+  - terminal
+testImports: []
