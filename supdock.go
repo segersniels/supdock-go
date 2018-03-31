@@ -1,43 +1,21 @@
 package main
 
 import (
-	"fmt"
-	"log"
 	"os"
-	"os/exec"
 
-	docker "./lib"
+	docker "./src/docker"
+	util "./src/util"
 )
-
-func help() {
-	supdockOut, err := exec.Command("supdock", "-h").Output()
-	if err != nil {
-		log.Fatal(err)
-	}
-	dockerOut, err := exec.Command("docker", "-h").Output()
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("%s", supdockOut)
-	fmt.Printf("%s", dockerOut)
-}
 
 func main() {
 	if len(os.Args) < 2 {
-		help()
+		util.Help()
 		os.Exit(0)
 	}
-
-	switch os.Args[1] {
-	case "logs":
-		docker.Execute("logs")
-	case "start":
-		docker.Execute("start")
-	case "stop":
-		docker.Execute("stop")
-	case "ssh":
-		docker.Execute("ssh")
-	default:
+	commands := []string{"logs", "start", "stop", "rm", "rmi", "ssh", "stats", "env", "prune", "history"}
+	if util.SliceExists(commands, os.Args[1]) && len(os.Args) == 2 {
+		docker.Execute(os.Args[1])
+	} else {
 		docker.Standard(os.Args[1:])
 	}
 }

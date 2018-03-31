@@ -37,7 +37,7 @@ func Standard(args []string) {
 }
 
 func constructChoices(ids []string, names []string) []string {
-	var choices = []string{}
+	choices := []string{}
 	for index, id := range ids {
 		choice := id + " - " + names[index]
 		if choice != " - " {
@@ -67,15 +67,13 @@ func constructPrompt(command string, ids []string, names []string, question stri
 			fmt.Println(err.Error())
 			return
 		}
-		var cmd = []string{
-			command,
-			strings.Split(answers.Selection, " - ")[0],
-		}
-		if command != "ssh" {
-			Standard(cmd)
-		} else {
-			command := strings.Split("exec -ti "+strings.Split(answers.Selection, " - ")[0]+" bash", " ")
-			Standard(command)
+		switch command {
+		case "ssh":
+			Standard(strings.Split("exec -ti "+strings.Split(answers.Selection, " - ")[0]+" bash", " "))
+		case "env":
+			Standard(strings.Split("exec -ti "+strings.Split(answers.Selection, " - ")[0]+" env", " "))
+		default:
+			Standard([]string{command, strings.Split(answers.Selection, " - ")[0]})
 		}
 	} else {
 		fmt.Print("ERR: No options found to construct prompt")
@@ -88,8 +86,8 @@ func Execute(command string) {
 	psNames := strings.Split(fullCommandExecute("docker ps |tail -n +2 |awk '{print $NF}'"), "\n")
 	psaIds := strings.Split(fullCommandExecute("docker ps -a |tail -n +2 |awk '{print $1}'"), "\n")
 	psaNames := strings.Split(fullCommandExecute("docker ps -a |tail -n +2 |awk '{print $NF}'"), "\n")
-	// imageIds := fullCommandExecute("docker images |tail -n +2 |awk '{print $3}'")
-	// imageNames := fullCommandExecute("docker images |tail -n +2 |awk '{print $1}'")
+	imageIds := strings.Split(fullCommandExecute("docker images |tail -n +2 |awk '{print $3}'"), "\n")
+	imageNames := strings.Split(fullCommandExecute("docker images |tail -n +2 |awk '{print $1}'"), "\n")
 	switch command {
 	case "logs":
 		constructPrompt("logs", psaIds, psaNames, "Which container would you like to see the logs of?")
@@ -99,5 +97,21 @@ func Execute(command string) {
 		constructPrompt("stop", psIds, psNames, "Which container would you like to stop?")
 	case "ssh":
 		constructPrompt("ssh", psIds, psNames, "Which container would you like to connect with?")
+	case "env":
+		constructPrompt("env", psIds, psNames, "Which container would you like to see the environment variables of?")
+	case "rm":
+		constructPrompt("rm", psaIds, psaNames, "Which container would you like to remove?")
+	case "rmi":
+		constructPrompt("rmi", imageIds, imageNames, "Which image would you like to remove?")
+	case "history":
+		constructPrompt("history", imageIds, imageNames, "Which image would you like to see the history of?")
+	case "prune":
+		Standard([]string{"system", command, "-f"})
+	case "stats":
+		if len(os.Args) > 2 && os.Args[2] == "all" {
+			Standard([]string{command})
+		} else {
+			constructPrompt("stats", psIds, psNames, "Which container would you like to see that stats of?")
+		}
 	}
 }
