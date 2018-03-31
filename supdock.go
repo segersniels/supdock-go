@@ -16,6 +16,10 @@ func main() {
 	if util.SliceExists(commands, os.Args[1]) && len(os.Args) == 2 {
 		docker.Execute(os.Args[1])
 	} else {
-		docker.Standard(os.Args[1:])
+		if os.Args[1] == "-h" || os.Args[1] == "--help" || os.Args[1] == "help" {
+			util.Help()
+		} else {
+			docker.Standard(os.Args[1:])
+		}
 	}
 }
