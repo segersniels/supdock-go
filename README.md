@@ -1,8 +1,6 @@
 # Supdock
 > Supdock in Golang is still under development. Installation section will be added when the package is deemed usable.
 
-[![NPM](https://nodei.co/npm/supdock.png?mini=true)](https://npmjs.org/package/supdock)
-
 What's Up, Dock(er)? A slightly more visual way to interact with the docker daemon. Supdock is a wrapper for the docker command meaning you can still use all of the other `docker` commands without issues.
 
 <p align="center">
