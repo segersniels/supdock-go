@@ -108,10 +108,6 @@ func Execute(command string) {
 	case "prune":
 		Standard([]string{"system", command, "-f"})
 	case "stats":
-		if len(os.Args) > 2 && os.Args[2] == "all" {
-			Standard([]string{command})
-		} else {
-			constructPrompt("stats", psIds, psNames, "Which container would you like to see that stats of?")
-		}
+		constructPrompt("stats", psIds, psNames, "Which container would you like to see that stats of?")
 	}
 }
