@@ -1,6 +1,4 @@
 # Supdock
-> Supdock in Golang is still under development. Installation section will be added when the package is deemed usable.
-
 What's Up, Dock(er)? A slightly more visual way to interact with the docker daemon. Supdock is a wrapper for the docker command meaning you can still use all of the other `docker` commands without issues.
 
 <p align="center">
@@ -11,6 +9,17 @@ Repetitive use of `docker ps`, `docker logs`, `docker stats` and `docker exec -t
 
 <p align="center">
 <img src="https://i.imgur.com/moY077k.gif" width="450">
+
+## Installation
+```bash
+curl https://raw.githubusercontent.com/segersniels/supdock-go/master/supdock-go > /usr/local/bin/supdock ; chmod +x /usr/local/bin/supdock
+```
+
+If you don't want to use `supdock` and `docker` separately you can just set an alias.
+
+```bash
+alias docker="supdock"
+```
 
 ## Usage
 ```
@@ -30,6 +39,14 @@ Commands:
   ssh               SSH into a container
   history           See the history of an image
   env               See the environment variables of a running container
+```
+
+## Why a Go version?
+As I have a running docker container count in my prompt, every new line basically executes `docker ps -q |wc -l |tr -d ' '`. But because I also have `docker` aliased to `supdock` the execution time for this command was getting noticeably slower as it was being executed through `node.js`. Which is not really known for it's optimal performance as it's single threaded.
+
+```bash
+supdock ps  0.33s user 0.07s system 103% cpu 0.390 total
+supdock-go ps  0.06s user 0.02s system 91% cpu 0.091 total
 ```
 
 ## Contributing
