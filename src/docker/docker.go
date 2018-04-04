@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/AlecAivazis/survey"
+	util "../util"
 )
 
 func fullCommandExecute(command string) string {
@@ -47,34 +47,13 @@ func constructChoices(ids []string, names []string) []string {
 	return choices
 }
 
-func askQuestion(question string, options []string) string {
-	var qs = []*survey.Question{
-		{
-			Name: "selection",
-			Prompt: &survey.Select{
-				Message: question,
-				Options: options,
-			},
-		},
-	}
-	answers := struct {
-		Selection string
-	}{}
-	err := survey.Ask(qs, &answers)
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(0)
-	}
-	return answers.Selection
-}
-
 func constructPrompt(command string, ids []string, names []string, question string) {
 	if len(ids) > 1 && len(names) > 1 {
 		options := constructChoices(ids, names)
-		answer := askQuestion(question, options)
+		answer := util.AskQuestion(question, options)
 		switch command {
 		case "ssh":
-			shell := askQuestion("Which shell is the container using?", []string{"bash", "ash"})
+			shell := util.AskQuestion("Which shell is the container using?", []string{"bash", "ash"})
 			Standard([]string{"exec", "-ti", strings.Split(answer, " - ")[0], shell})
 		case "env":
 			Standard([]string{"exec", "-ti", strings.Split(answer, " - ")[0], "env"})
