@@ -63,6 +63,7 @@ func askQuestion(question string, options []string) string {
 	err := survey.Ask(qs, &answers)
 	if err != nil {
 		fmt.Println(err.Error())
+		os.Exit(0)
 	}
 	return answers.Selection
 }
