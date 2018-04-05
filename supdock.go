@@ -6,8 +6,8 @@ import (
 	"os"
 	"os/exec"
 
-	docker "./src/docker"
-	util "./src/util"
+	docker "supdock-go/src/docker"
+	util "supdock-go/src/util"
 )
 
 func usage() {

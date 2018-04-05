@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"strings"
 
-	util "../util"
+	util "supdock-go/src/util"
 )
 
 func fullCommandExecute(command string) string {
