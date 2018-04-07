@@ -33,7 +33,6 @@ Commands:
 	fmt.Print(output)
 }
 
-// Help : call docker help as output for supdock
 func help() {
 	usage()
 	dockerOut, err := exec.Command("docker", "--help").Output()
