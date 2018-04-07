@@ -7,7 +7,8 @@ import (
 	"os/exec"
 
 	docker "supdock-go/src/docker"
-	util "supdock-go/src/util"
+
+	"github.com/segersniels/goutil"
 )
 
 func usage() {
@@ -59,7 +60,7 @@ func main() {
 		"prune",
 		"history",
 	}
-	if util.SliceExists(commands, os.Args[1]) && len(os.Args) == 2 {
+	if util.Exists(commands, os.Args[1]) && len(os.Args) == 2 {
 		docker.Execute(os.Args[1])
 	} else {
 		switch os.Args[1] {
