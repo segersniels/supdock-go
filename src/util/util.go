@@ -1,6 +1,7 @@
 package util
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -98,4 +99,23 @@ func SearchForFile(name string) []Search {
 	wg.Wait()
 
 	return searches
+}
+
+// Repo : repo object
+type Repo struct {
+	Repo  string `json:"repo"`
+	Short string `json:"short"`
+}
+
+// ParseJson : read through a json file
+func ParseJson(filename string) []Repo {
+	file, err := os.Open(filename)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer file.Close()
+	byteValue, _ := ioutil.ReadAll(file)
+	var repos []Repo
+	json.Unmarshal(byteValue, &repos)
+	return repos
 }

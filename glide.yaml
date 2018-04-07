@@ -1,4 +1,4 @@
-package: .
+package: github.com/segersniels/supdock-go
 import:
 - package: github.com/AlecAivazis/survey
   version: ^1.5.1

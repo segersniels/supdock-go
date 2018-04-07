@@ -12,7 +12,7 @@ Repetitive use of `docker ps`, `docker logs`, `docker stats` and `docker exec -t
 
 ## Installation
 ```bash
-curl https://raw.githubusercontent.com/segersniels/supdock-go/master/supdock-go > /usr/local/bin/supdock ; chmod +x /usr/local/bin/supdock
+curl https://raw.githubusercontent.com/segersniels/supdock-go/master/bin/supdock > /usr/local/bin/supdock ; chmod +x /usr/local/bin/supdock
 ```
 
 If you don't want to use `supdock` and `docker` separately you can just set an alias.
