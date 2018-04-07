@@ -50,10 +50,10 @@ func constructChoices(ids []string, names []string) []string {
 func constructPrompt(command string, ids []string, names []string, question string) {
 	if len(ids) > 1 && len(names) > 1 {
 		options := constructChoices(ids, names)
-		answer := util.AskQuestion(question, options)
+		answer := util.Question(question, options)
 		switch command {
 		case "ssh":
-			shell := util.AskQuestion("Which shell is the container using?", []string{"bash", "ash"})
+			shell := util.Question("Which shell is the container using?", []string{"bash", "ash"})
 			Standard([]string{"exec", "-ti", strings.Split(answer, " - ")[0], shell})
 		case "env":
 			Standard([]string{"exec", "-ti", strings.Split(answer, " - ")[0], "env"})
