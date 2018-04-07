@@ -1,5 +1,5 @@
 hash: 9a0ce305254b550da2bfa6e3ab23244f74295eee8b1151384666bafd5df1b183
-updated: 2018-04-07T16:03:09.110562+02:00
+updated: 2018-04-07T16:10:49.534718+02:00
 imports:
 - name: github.com/AlecAivazis/survey
   version: 9d3458c219bae9653d267883634bdb5375281fd8
@@ -10,7 +10,7 @@ imports:
 - name: github.com/mgutz/ansi
   version: 9520e82c474b0a04dd04f8a40959027271bab992
 - name: github.com/segersniels/goutil
-  version: f83ea1b68dd46e66cdf4adc7c3c51a590b98a291
+  version: 297c2046345a911a8ea5a0f3800ed78551524fc3
 - name: golang.org/x/sys
   version: f67933eaf9e2f750f58a234209a11ebc1107be38
   subpackages:

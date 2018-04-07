@@ -1,7 +1,6 @@
 package util
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -29,8 +28,8 @@ func Exists(slice interface{}, item interface{}) bool {
 	return false
 }
 
-// AskQuestion : ask the user a question prompt using survey package
-func AskQuestion(question string, options []string) string {
+// Question : ask the user a question prompt using survey package
+func Question(question string, options []string) string {
 	var qs = []*survey.Question{
 		{
 			Name: "selection",
@@ -95,31 +94,10 @@ func SearchForFile(name string) []Search {
 	usr, _ := user.Current()
 	searches := []Search{}
 	var wg = new(sync.WaitGroup)
-
 	wg.Add(1)
 	go scan(wg, usr.HomeDir, 5, &searches, name)
 	wg.Wait()
-
 	return searches
-}
-
-// Repo : repo object
-type Repo struct {
-	Repo  string `json:"repo"`
-	Short string `json:"short"`
-}
-
-// ParseJSON : read through a json file
-func ParseJSON(filename string) []Repo {
-	file, err := os.Open(filename)
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer file.Close()
-	byteValue, _ := ioutil.ReadAll(file)
-	var repos []Repo
-	json.Unmarshal(byteValue, &repos)
-	return repos
 }
 
 // Download : download a given file to a location
