@@ -27,6 +27,7 @@ Commands:
 	ssh               SSH into a container
 	history           See the history of an image
 	env               See the environment variables of a running container
+	latest            Update to the latest version of supdock
 `
 	fmt.Print(output)
 }
@@ -46,13 +47,27 @@ func main() {
 		help()
 		os.Exit(0)
 	}
-	commands := []string{"logs", "start", "stop", "rm", "rmi", "ssh", "stats", "env", "prune", "history"}
+	commands := []string{
+		"logs",
+		"start",
+		"stop",
+		"rm",
+		"rmi",
+		"ssh",
+		"stats",
+		"env",
+		"prune",
+		"history",
+	}
 	if util.SliceExists(commands, os.Args[1]) && len(os.Args) == 2 {
 		docker.Execute(os.Args[1])
 	} else {
-		if os.Args[1] == "-h" || os.Args[1] == "--help" || os.Args[1] == "help" {
+		switch os.Args[1] {
+		case "-h", "--help", "help":
 			help()
-		} else {
+		case "latest":
+			util.Download("/usr/local/bin/supdock", "https://github.com/segersniels/supdock-go/raw/master/bin/supdock")
+		default:
 			docker.Standard(os.Args[1:])
 		}
 	}

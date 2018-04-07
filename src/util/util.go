@@ -3,7 +3,9 @@ package util
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -118,4 +120,30 @@ func ParseJson(filename string) []Repo {
 	var repos []Repo
 	json.Unmarshal(byteValue, &repos)
 	return repos
+}
+
+// Download : download a given file to a location
+func Download(filepath string, url string) (err error) {
+	out, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("bad status: %s", resp.Status)
+	}
+
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
