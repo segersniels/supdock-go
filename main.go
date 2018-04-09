@@ -66,7 +66,7 @@ func main() {
 		case "-h", "--help", "help":
 			help()
 		case "latest":
-			util.Download("/usr/local/bin/supdock", "https://github.com/segersniels/supdock-go/raw/master/bin/supdock")
+			util.Download("/usr/local/bin/supdock", "https://raw.githubusercontent.com/segersniels/supdock-go/master/bin/supdock")
 		default:
 			docker.Standard(os.Args[1:])
 		}
