@@ -68,10 +68,10 @@ func constructPrompt(command string, ids []string, names []string, question stri
 // Execute : return a prompt and execute
 func Execute(command string) {
 	psIds := strings.Split(fullCommandExecute("docker ps |tail -n +2 |awk '{print $1}'"), "\n")
-	psNames := strings.Split(fullCommandExecute("docker ps |tail -n +2 |awk '{print $NF}'"), "\n")
 	psaIds := strings.Split(fullCommandExecute("docker ps -a |tail -n +2 |awk '{print $1}'"), "\n")
-	psaNames := strings.Split(fullCommandExecute("docker ps -a |tail -n +2 |awk '{print $NF}'"), "\n")
 	imageIds := strings.Split(fullCommandExecute("docker images |tail -n +2 |awk '{print $3}'"), "\n")
+	psNames := strings.Split(fullCommandExecute("docker ps |tail -n +2 |awk '{print $NF}'"), "\n")
+	psaNames := strings.Split(fullCommandExecute("docker ps -a |tail -n +2 |awk '{print $NF}'"), "\n")
 	imageNames := strings.Split(fullCommandExecute("docker images |tail -n +2 |awk '{print $1}'"), "\n")
 	switch command {
 	case "logs":
