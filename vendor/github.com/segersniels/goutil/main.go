@@ -1,11 +1,13 @@
 package util
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"os/exec"
 	"os/user"
 	"path/filepath"
 	"reflect"
@@ -26,6 +28,27 @@ func Exists(slice interface{}, item interface{}) bool {
 		}
 	}
 	return false
+}
+
+// RequireInput : ask for input to the user
+func RequireInput(question string) string {
+	var qs = []*survey.Question{
+		{
+			Name: "selection",
+			Prompt: &survey.Input{
+				Message: question,
+			},
+		},
+	}
+	answers := struct {
+		Selection string
+	}{}
+	err := survey.Ask(qs, &answers)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(0)
+	}
+	return answers.Selection
 }
 
 // Question : ask the user a question prompt using survey package
@@ -124,4 +147,80 @@ func Download(filepath string, url string) (err error) {
 	}
 
 	return nil
+}
+
+// GetIndexString : search a slice for a value and return its index
+func GetIndexString(value string, slice []string) int {
+	for index, v := range slice {
+		if value == v {
+			return index
+		}
+	}
+	return -1
+}
+
+// GetIndexInt : search a slice for a value and return its index
+func GetIndexInt(value int, slice []int) int {
+	for index, v := range slice {
+		if value == v {
+			return index
+		}
+	}
+	return -1
+}
+
+// Min : return the minimum value of a slice
+func Min(values []int) int {
+	min := values[0]
+	for _, v := range values {
+		if v < min {
+			min = v
+		}
+	}
+	return min
+}
+
+// Max : return the maximum value of a slice
+func Max(values []int) int {
+	max := values[0]
+	for _, v := range values {
+		if v > max {
+			max = v
+		}
+	}
+	return max
+}
+
+// ExecuteWithOutput : execute a command through bash -c and return the stdout
+func ExecuteWithOutput(command string) string {
+	cmd := exec.Command("bash", "-c", command)
+	var outbuf, errbuf bytes.Buffer
+	cmd.Stderr = &errbuf
+	cmd.Stdout = &outbuf
+	cmd.Stdin = os.Stdin
+	err := cmd.Run()
+	if err != nil {
+		fmt.Print(errbuf.String())
+	}
+	return outbuf.String()
+}
+
+// Execute : execute a command through bash -c, pass []string{} as env to ignore custom vars
+func Execute(command string, env []string) {
+	var errbuf bytes.Buffer
+	cmd := exec.Command("bash", "-c", command)
+	cmd.Stderr = &errbuf
+	cmd.Stdout = os.Stdout
+	cmd.Stdin = os.Stdin
+	if len(env) > 0 {
+		cmd.Env = os.Environ()
+		for _, e := range env {
+			cmd.Env = append(cmd.Env, e)
+		}
+	}
+	err := cmd.Run()
+	if err != nil {
+		fmt.Print(errbuf.String())
+		os.Exit(0)
+	}
 }

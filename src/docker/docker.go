@@ -18,7 +18,7 @@ func fullCommandExecute(command string) string {
 	cmd.Stdin = os.Stdin
 	err := cmd.Run()
 	if err != nil {
-		fmt.Print(errbuf.String())
+		fmt.Println(errbuf.String())
 	}
 	return outbuf.String()
 }
@@ -32,7 +32,7 @@ func Standard(args []string) {
 	cmd.Stdin = os.Stdin
 	err := cmd.Run()
 	if err != nil {
-		fmt.Print(errbuf.String())
+		fmt.Println(errbuf.String())
 	}
 }
 
@@ -61,38 +61,40 @@ func constructPrompt(command string, ids []string, names []string, question stri
 			Standard([]string{command, strings.Split(answer, " - ")[0]})
 		}
 	} else {
-		fmt.Print("ERR: No options found to construct prompt")
+		fmt.Println("ERR: No options found to construct prompt")
 	}
 }
 
 // Execute : return a prompt and execute
-func Execute(command string) {
+func Execute(args []string) {
 	psIds := strings.Split(fullCommandExecute("docker ps |tail -n +2 |awk '{print $1}'"), "\n")
 	psaIds := strings.Split(fullCommandExecute("docker ps -a |tail -n +2 |awk '{print $1}'"), "\n")
 	imageIds := strings.Split(fullCommandExecute("docker images |tail -n +2 |awk '{print $3}'"), "\n")
 	psNames := strings.Split(fullCommandExecute("docker ps |tail -n +2 |awk '{print $NF}'"), "\n")
 	psaNames := strings.Split(fullCommandExecute("docker ps -a |tail -n +2 |awk '{print $NF}'"), "\n")
 	imageNames := strings.Split(fullCommandExecute("docker images |tail -n +2 |awk '{print $1}'"), "\n")
-	switch command {
-	case "logs":
-		constructPrompt("logs", psaIds, psaNames, "Which container would you like to see the logs of?")
-	case "start":
-		constructPrompt("start", psaIds, psaNames, "Which container would you like to start?")
-	case "stop":
-		constructPrompt("stop", psIds, psNames, "Which container would you like to stop?")
-	case "ssh":
-		constructPrompt("ssh", psIds, psNames, "Which container would you like to connect with?")
-	case "env":
-		constructPrompt("env", psIds, psNames, "Which container would you like to see the environment variables of?")
-	case "rm":
-		constructPrompt("rm", psaIds, psaNames, "Which container would you like to remove?")
-	case "rmi":
-		constructPrompt("rmi", imageIds, imageNames, "Which image would you like to remove?")
-	case "history":
-		constructPrompt("history", imageIds, imageNames, "Which image would you like to see the history of?")
-	case "prune":
-		Standard([]string{"system", command, "-f"})
-	case "stats":
-		constructPrompt("stats", psIds, psNames, "Which container would you like to see that stats of?")
+	if len(args) == 1 {
+		switch args[0] {
+		case "logs":
+			constructPrompt("logs", psaIds, psaNames, "Which container would you like to see the logs of?")
+		case "start":
+			constructPrompt("start", psaIds, psaNames, "Which container would you like to start?")
+		case "stop":
+			constructPrompt("stop", psIds, psNames, "Which container would you like to stop?")
+		case "ssh":
+			constructPrompt("ssh", psIds, psNames, "Which container would you like to connect with?")
+		case "env":
+			constructPrompt("env", psIds, psNames, "Which container would you like to see the environment variables of?")
+		case "rm":
+			constructPrompt("rm", psaIds, psaNames, "Which container would you like to remove?")
+		case "rmi":
+			constructPrompt("rmi", imageIds, imageNames, "Which image would you like to remove?")
+		case "history":
+			constructPrompt("history", imageIds, imageNames, "Which image would you like to see the history of?")
+		case "stats":
+			constructPrompt("stats", psIds, psNames, "Which container would you like to see that stats of?")
+		}
+	} else {
+		Standard(args[0:])
 	}
 }

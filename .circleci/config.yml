@@ -1,0 +1,23 @@
+version: 2
+defaults: &defaults
+  working_directory: /go/src/supdock-go
+  docker:
+    - image: circleci/golang
+
+jobs:
+  build:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: "Build testing binary"
+          command: |
+            GOOS=linux go build -o bin/linux/supdock
+      - run:
+          name: "Test if binary is executable"
+          command: |
+            ./bin/linux/supdock -h
+      - run:
+          name: "Release binary"
+          command: |
+            ./release.sh
