@@ -37,7 +37,7 @@ Commands:
 
 func version() {
 	app := "supdock"
-	version := "0.1.2"
+	version := "0.1.1"
 	fmt.Println(app, "version", version)
 }
 
@@ -81,7 +81,7 @@ func main() {
 	if util.Exists(commands, os.Args[1]) && len(os.Args) == 2 {
 		docker.Execute(os.Args[1])
 	} else {
-		switch os.Args[1] {
+		switch os.Args[1] {,
 		case "-h", "--help", "help":
 			help()
 		case "-v", "--version", "version":
