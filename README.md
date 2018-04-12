@@ -41,6 +41,7 @@ Commands:
   ssh               SSH into a container
   history           See the history of an image
   env               See the environment variables of a running container
+  latest, update    Update to the latest version of supdock
 ```
 
 ## Why a Go version?
