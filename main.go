@@ -22,6 +22,7 @@ Options:
 Commands:
 	stop              Stop a running container
 	start             Start a stopped container
+	restart           Restart a running container
 	logs              See the logs of a container
 	rm                Remove a container
 	rmi               Remove an image
@@ -37,7 +38,7 @@ Commands:
 
 func version() {
 	app := "supdock"
-	version := "0.1.1"
+	version := "0.1.2"
 	fmt.Println(app, "version", version)
 }
 
@@ -77,6 +78,7 @@ func main() {
 		"env",
 		"prune",
 		"history",
+		"restart",
 	}
 	if util.Exists(commands, os.Args[1]) && len(os.Args) == 2 {
 		docker.Execute(os.Args[1])

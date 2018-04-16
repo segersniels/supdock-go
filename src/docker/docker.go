@@ -78,6 +78,8 @@ func Execute(command string) {
 		constructPrompt("logs", psaIds, psaNames, "Which container would you like to see the logs of?")
 	case "start":
 		constructPrompt("start", psaIds, psaNames, "Which container would you like to start?")
+	case "restart":
+		constructPrompt("restart", psIds, psNames, "Which container would you like to restart?")
 	case "stop":
 		constructPrompt("stop", psIds, psNames, "Which container would you like to stop?")
 	case "ssh":
