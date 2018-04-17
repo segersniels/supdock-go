@@ -18,7 +18,7 @@ func fullCommandExecute(command string) string {
 	cmd.Stdin = os.Stdin
 	err := cmd.Run()
 	if err != nil {
-		fmt.Print(errbuf.String())
+		fmt.Println(errbuf.String())
 	}
 	return outbuf.String()
 }
@@ -32,7 +32,7 @@ func Standard(args []string) {
 	cmd.Stdin = os.Stdin
 	err := cmd.Run()
 	if err != nil {
-		fmt.Print(errbuf.String())
+		fmt.Println(errbuf.String())
 	}
 }
 
@@ -61,7 +61,7 @@ func constructPrompt(command string, ids []string, names []string, question stri
 			Standard([]string{command, strings.Split(answer, " - ")[0]})
 		}
 	} else {
-		fmt.Print("ERR: No options found to construct prompt")
+		fmt.Println("ERR: No options found to construct prompt")
 	}
 }
 
