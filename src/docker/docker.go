@@ -92,8 +92,6 @@ func Execute(command string) {
 		constructPrompt("rmi", imageIds, imageNames, "Which image would you like to remove?")
 	case "history":
 		constructPrompt("history", imageIds, imageNames, "Which image would you like to see the history of?")
-	case "prune":
-		Standard([]string{"system", command, "-f"})
 	case "stats":
 		constructPrompt("stats", psIds, psNames, "Which container would you like to see that stats of?")
 	}

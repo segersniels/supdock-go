@@ -76,7 +76,6 @@ func main() {
 		"ssh",
 		"stats",
 		"env",
-		"prune",
 		"history",
 		"restart",
 	}
@@ -90,6 +89,8 @@ func main() {
 			version()
 		case "latest", "update":
 			update()
+		case "prune":
+			docker.Standard([]string{"system", "prune", "-f"})
 		default:
 			docker.Standard(os.Args[1:])
 		}
