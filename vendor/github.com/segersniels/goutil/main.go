@@ -16,20 +16,6 @@ import (
 	"github.com/AlecAivazis/survey"
 )
 
-// Exists : check if a slice contains a specific value
-func Exists(slice interface{}, item interface{}) bool {
-	s := reflect.ValueOf(slice)
-	if s.Kind() != reflect.Slice {
-		panic("SliceExists() given a non-slice type")
-	}
-	for i := 0; i < s.Len(); i++ {
-		if s.Index(i).Interface() == item {
-			return true
-		}
-	}
-	return false
-}
-
 // RequireInput : ask for input to the user
 func RequireInput(question string) string {
 	var qs = []*survey.Question{
@@ -137,10 +123,6 @@ func Download(filepath string, url string) (err error) {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("bad status: %s", resp.Status)
-	}
-
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
 		return err
@@ -149,21 +131,29 @@ func Download(filepath string, url string) (err error) {
 	return nil
 }
 
-// GetIndexString : search a slice for a value and return its index
-func GetIndexString(value string, slice []string) int {
-	for index, v := range slice {
-		if value == v {
-			return index
+// Exists : check if a slice contains a specific value
+func Exists(slice interface{}, item interface{}) bool {
+	s := reflect.ValueOf(slice)
+	if s.Kind() != reflect.Slice {
+		panic("SliceExists() given a non-slice type")
+	}
+	for i := 0; i < s.Len(); i++ {
+		if s.Index(i).Interface() == item {
+			return true
 		}
 	}
-	return -1
+	return false
 }
 
-// GetIndexInt : search a slice for a value and return its index
-func GetIndexInt(value int, slice []int) int {
-	for index, v := range slice {
-		if value == v {
-			return index
+// GetIndex : search a slice for a value and return its index
+func GetIndex(slice interface{}, item interface{}) int {
+	s := reflect.ValueOf(slice)
+	if s.Kind() != reflect.Slice {
+		panic("SliceExists() given a non-slice type")
+	}
+	for i := 0; i < s.Len(); i++ {
+		if s.Index(i).Interface() == item {
+			return i
 		}
 	}
 	return -1

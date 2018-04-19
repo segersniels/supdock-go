@@ -1,2 +1,8 @@
 package: goutil
-import: []
+import:
+- package: github.com/sirupsen/logrus
+  version: ~1.0.5
+- package: github.com/davecgh/go-spew
+  version: ^1.1.0
+  subpackages:
+  - spew

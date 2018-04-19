@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"runtime"
@@ -46,7 +45,7 @@ func help() {
 	usage()
 	dockerOut, err := exec.Command("docker", "--help").Output()
 	if err != nil {
-		log.Fatal(err)
+		util.Error(err)
 	}
 	fmt.Printf("%s", dockerOut)
 }
@@ -55,8 +54,7 @@ func update() {
 	version := strings.TrimSpace(util.ExecuteWithOutput("curl --silent 'https://api.github.com/repos/segersniels/supdock-go/releases/latest' |grep tag_name |awk '{print $2}' |tr -d '\",v'"))
 	distro := strings.TrimSpace(runtime.GOOS)
 	if distro != "darwin" && distro != "linux" {
-		fmt.Println("ERR: operating system does not equal either linux or darwin")
-		os.Exit(0)
+		util.Error("Operating system does not equal linux or darwin")
 	}
 	fmt.Println("Updating to version", version+"-"+distro)
 	util.Download("/usr/local/bin/supdock", "https://github.com/segersniels/supdock-go/releases/download/v"+version+"/supdock_"+version+"_"+distro+"_amd64")
