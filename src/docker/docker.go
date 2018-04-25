@@ -64,5 +64,7 @@ func Execute(command string) {
 		constructPrompt("history", imageIds, imageNames, "Which image would you like to see the history of?")
 	case "stats":
 		constructPrompt("stats", psIds, psNames, "Which container would you like to see that stats of?")
+	case "inspect":
+		constructPrompt("inspect", psIds, psNames, "Which container would you like to inspect?")
 	}
 }

@@ -33,17 +33,19 @@ Options:
   -h, --help         output usage information
 
 Commands:
-  stop              Stop a running container
-  start             Start a stopped container
-  logs              See the logs of a container
-  rm                Remove a container
-  rmi               Remove an image
-  prune             Remove stopped containers and dangling images
-  stats             See the stats of a container
-  ssh               SSH into a container
-  history           See the history of an image
-  env               See the environment variables of a running container
-  latest, update    Update to the latest version of supdock
+	stop              Stop a running container
+	start             Start a stopped container
+	restart           Restart a running container
+	logs              See the logs of a container
+	rm                Remove a container
+	rmi               Remove an image
+	prune             Remove stopped containers and dangling images
+	stats             See the stats of a container
+	ssh               SSH into a container
+	history           See the history of an image
+	history           Inspect a container
+	env               See the environment variables of a running container
+	latest, update    Update to the latest version of supdock
 ```
 
 ## Why a Go version?

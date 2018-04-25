@@ -29,6 +29,7 @@ Commands:
 	stats             See the stats of a container
 	ssh               SSH into a container
 	history           See the history of an image
+	history           Inspect a container
 	env               See the environment variables of a running container
 	latest, update    Update to the latest version of supdock
 `
@@ -76,6 +77,7 @@ func main() {
 		"env",
 		"history",
 		"restart",
+		"inspect",
 	}
 	if util.Exists(commands, os.Args[1]) && len(os.Args) == 2 {
 		docker.Execute(os.Args[1])
