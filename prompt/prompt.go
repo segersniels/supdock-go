@@ -9,7 +9,8 @@ import (
 	"github.com/segersniels/goutil"
 )
 
-func docker(args []string) {
+// Docker : standard docker execution
+func Docker(args []string) {
 	var errbuf bytes.Buffer
 	cmd := exec.Command("docker", args...)
 	cmd.Stderr = &errbuf
@@ -40,11 +41,11 @@ func Exec(command string, ids []string, names []string, question string) {
 		switch command {
 		case "ssh":
 			shell := util.Question("Which shell is the container using?", []string{"bash", "ash"})
-			docker([]string{"exec", "-ti", strings.Split(answer, " - ")[0], shell})
+			Docker([]string{"exec", "-ti", strings.Split(answer, " - ")[0], shell})
 		case "env":
-			docker([]string{"exec", "-ti", strings.Split(answer, " - ")[0], "env"})
+			Docker([]string{"exec", "-ti", strings.Split(answer, " - ")[0], "env"})
 		default:
-			docker([]string{command, strings.Split(answer, " - ")[0]})
+			Docker([]string{command, strings.Split(answer, " - ")[0]})
 		}
 	} else {
 		util.Warn("No options found to construct prompt")
