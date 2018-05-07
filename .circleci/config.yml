@@ -12,12 +12,12 @@ jobs:
       - run:
           name: "Build testing binary"
           command: |
-            GOOS=linux go build -o bin/linux/supdock
+            GOOS=linux go build -o bin/supdock
       - run:
           name: "Test if binary is executable"
           command: |
-            ./bin/linux/supdock -h
+            ./bin/supdock -h
       - run:
           name: "Release binary"
           command: |
-            ./release.sh
+            ./gorelease.sh

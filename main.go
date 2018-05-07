@@ -7,10 +7,27 @@ import (
 	"runtime"
 	"strings"
 
-	"supdock-go/src/docker"
-
 	"github.com/segersniels/goutil"
+	"github.com/segersniels/supdock-go/prompt"
 )
+
+var psIds, psaIds, imageIds, psNames, psaNames, imageNames []string
+
+func initialise() {
+	ids, _ := util.ExecuteWithOutput("docker ps -q")
+	psIds = strings.Split(ids, "\n")
+	ids, _ = util.ExecuteWithOutput("docker ps -aq")
+	psaIds = strings.Split(ids, "\n")
+	ids, _ = util.ExecuteWithOutput("docker images -q")
+	imageIds = strings.Split(ids, "\n")
+
+	names, _ := util.ExecuteWithOutput("docker ps |tail -n +2 |awk '{print $NF}'")
+	psNames = strings.Split(names, "\n")
+	names, _ = util.ExecuteWithOutput("docker ps -a |tail -n +2 |awk '{print $NF}'")
+	psaNames = strings.Split(names, "\n")
+	names, _ = util.ExecuteWithOutput("docker images |tail -n +2 |awk '{print $1}'")
+	imageNames = strings.Split(names, "\n")
+}
 
 func usage() {
 	output := `Usage: supdock [options] [command]
@@ -52,13 +69,45 @@ func help() {
 }
 
 func update() {
-	version := strings.TrimSpace(util.ExecuteWithOutput("curl --silent 'https://api.github.com/repos/segersniels/supdock-go/releases/latest' |grep tag_name |awk '{print $2}' |tr -d '\",v'"))
+	output, _ := util.ExecuteWithOutput("curl --silent 'https://api.github.com/repos/segersniels/supdock-go/releases/latest' |grep tag_name |awk '{print $2}' |tr -d '\",v'")
+	version := strings.TrimSpace(output)
 	distro := strings.TrimSpace(runtime.GOOS)
 	if distro != "darwin" && distro != "linux" {
 		util.Error("Operating system does not equal linux or darwin")
 	}
 	fmt.Println("Updating to version", version+"-"+distro)
-	util.Download("/usr/local/bin/supdock", "https://github.com/segersniels/supdock-go/releases/download/v"+version+"/supdock_"+version+"_"+distro+"_amd64")
+	err := util.Download("/usr/local/bin/supdock", "https://github.com/segersniels/supdock-go/releases/download/v"+version+"/supdock_"+version+"_"+distro+"_amd64")
+	if err != nil {
+		util.Error(err)
+	}
+}
+
+func execute(command string) {
+	initialise()
+	switch command {
+	case "logs":
+		prompt.Exec("logs", psaIds, psaNames, "Which container would you like to see the logs of?")
+	case "start":
+		prompt.Exec("start", psaIds, psaNames, "Which container would you like to start?")
+	case "restart":
+		prompt.Exec("restart", psIds, psNames, "Which container would you like to restart?")
+	case "stop":
+		prompt.Exec("stop", psIds, psNames, "Which container would you like to stop?")
+	case "ssh":
+		prompt.Exec("ssh", psIds, psNames, "Which container would you like to connect with?")
+	case "env":
+		prompt.Exec("env", psIds, psNames, "Which container would you like to see the environment variables of?")
+	case "rm":
+		prompt.Exec("rm", psaIds, psaNames, "Which container would you like to remove?")
+	case "rmi":
+		prompt.Exec("rmi", imageIds, imageNames, "Which image would you like to remove?")
+	case "history":
+		prompt.Exec("history", imageIds, imageNames, "Which image would you like to see the history of?")
+	case "stats":
+		prompt.Exec("stats", psIds, psNames, "Which container would you like to see that stats of?")
+	case "inspect":
+		prompt.Exec("inspect", psIds, psNames, "Which container would you like to inspect?")
+	}
 }
 
 func main() {
@@ -80,7 +129,7 @@ func main() {
 		"inspect",
 	}
 	if util.Exists(commands, os.Args[1]) && len(os.Args) == 2 {
-		docker.Execute(os.Args[1])
+		execute(os.Args[1])
 	} else {
 		switch os.Args[1] {
 		case "-h", "--help", "help":
@@ -90,9 +139,19 @@ func main() {
 		case "latest", "update":
 			update()
 		case "prune":
-			docker.Standard([]string{"system", "prune", "-f"})
+			err := util.Execute("docker system prune -f", []string{})
+			if err != nil {
+				util.Error(err)
+			}
 		default:
-			docker.Standard(os.Args[1:])
+			cmd := exec.Command("docker", os.Args[1:]...)
+			cmd.Stderr = os.Stderr
+			cmd.Stdout = os.Stdout
+			cmd.Stdin = os.Stdin
+			err := cmd.Run()
+			if err != nil {
+				util.Error(err)
+			}
 		}
 	}
 }

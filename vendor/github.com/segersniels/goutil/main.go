@@ -2,7 +2,6 @@ package util
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -16,8 +15,8 @@ import (
 	"github.com/AlecAivazis/survey"
 )
 
-// RequireInput : ask for input to the user
-func RequireInput(question string) string {
+// Input : ask for user input
+func Input(question string) (string, error) {
 	var qs = []*survey.Question{
 		{
 			Name: "selection",
@@ -30,15 +29,29 @@ func RequireInput(question string) string {
 		Selection string
 	}{}
 	err := survey.Ask(qs, &answers)
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(0)
+	return answers.Selection, err
+}
+
+// InputDefault : ask for user input with default value
+func InputDefault(question string, value string) (string, error) {
+	var qs = []*survey.Question{
+		{
+			Name: "selection",
+			Prompt: &survey.Input{
+				Message: question,
+				Default: value,
+			},
+		},
 	}
-	return answers.Selection
+	answers := struct {
+		Selection string
+	}{}
+	err := survey.Ask(qs, &answers)
+	return answers.Selection, err
 }
 
 // Question : ask the user a question prompt using survey package
-func Question(question string, options []string) string {
+func Question(question string, options []string) (string, error) {
 	var qs = []*survey.Question{
 		{
 			Name: "selection",
@@ -52,11 +65,7 @@ func Question(question string, options []string) string {
 		Selection string
 	}{}
 	err := survey.Ask(qs, &answers)
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(0)
-	}
-	return answers.Selection
+	return answers.Selection, err
 }
 
 // Search : search object needed for SearchForFile
@@ -110,7 +119,7 @@ func SearchForFile(name string) []Search {
 }
 
 // Download : download a given file to a location
-func Download(filepath string, url string) (err error) {
+func Download(filepath string, url string) error {
 	out, err := os.Create(filepath)
 	if err != nil {
 		return err
@@ -182,21 +191,18 @@ func Max(values []int) int {
 }
 
 // ExecuteWithOutput : execute a command through bash -c and return the stdout
-func ExecuteWithOutput(command string) string {
+func ExecuteWithOutput(command string) (string, error) {
 	cmd := exec.Command("bash", "-c", command)
 	var outbuf, errbuf bytes.Buffer
 	cmd.Stderr = &errbuf
 	cmd.Stdout = &outbuf
 	cmd.Stdin = os.Stdin
 	err := cmd.Run()
-	if err != nil {
-		fmt.Print(errbuf.String())
-	}
-	return outbuf.String()
+	return outbuf.String(), err
 }
 
 // Execute : execute a command through bash -c, pass []string{} as env to ignore custom vars
-func Execute(command string, env []string) {
+func Execute(command string, env []string) error {
 	var errbuf bytes.Buffer
 	cmd := exec.Command("bash", "-c", command)
 	cmd.Stderr = &errbuf
@@ -209,8 +215,5 @@ func Execute(command string, env []string) {
 		}
 	}
 	err := cmd.Run()
-	if err != nil {
-		fmt.Print(errbuf.String())
-		os.Exit(0)
-	}
+	return err
 }
