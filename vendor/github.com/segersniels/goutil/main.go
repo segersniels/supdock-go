@@ -16,7 +16,7 @@ import (
 )
 
 // Input : ask for user input
-func Input(question string) (string, error) {
+func Input(question string) string {
 	var qs = []*survey.Question{
 		{
 			Name: "selection",
@@ -29,11 +29,14 @@ func Input(question string) (string, error) {
 		Selection string
 	}{}
 	err := survey.Ask(qs, &answers)
-	return answers.Selection, err
+	if err != nil {
+		Error(err)
+	}
+	return answers.Selection
 }
 
 // InputDefault : ask for user input with default value
-func InputDefault(question string, value string) (string, error) {
+func InputDefault(question string, value string) string {
 	var qs = []*survey.Question{
 		{
 			Name: "selection",
@@ -47,11 +50,14 @@ func InputDefault(question string, value string) (string, error) {
 		Selection string
 	}{}
 	err := survey.Ask(qs, &answers)
-	return answers.Selection, err
+	if err != nil {
+		Error(err)
+	}
+	return answers.Selection
 }
 
 // Question : ask the user a question prompt using survey package
-func Question(question string, options []string) (string, error) {
+func Question(question string, options []string) string {
 	var qs = []*survey.Question{
 		{
 			Name: "selection",
@@ -65,7 +71,10 @@ func Question(question string, options []string) (string, error) {
 		Selection string
 	}{}
 	err := survey.Ask(qs, &answers)
-	return answers.Selection, err
+	if err != nil {
+		Error(err)
+	}
+	return answers.Selection
 }
 
 // Search : search object needed for SearchForFile

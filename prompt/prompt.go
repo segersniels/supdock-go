@@ -36,16 +36,10 @@ func constructChoices(ids []string, names []string) []string {
 func Exec(command string, ids []string, names []string, question string) {
 	if len(ids) > 1 && len(names) > 1 {
 		options := constructChoices(ids, names)
-		answer, err := util.Question(question, options)
-		if err != nil {
-			util.Error(err)
-		}
+		answer := util.Question(question, options)
 		switch command {
 		case "ssh":
-			shell, err := util.Question("Which shell is the container using?", []string{"bash", "ash"})
-			if err != nil {
-				util.Error(err)
-			}
+			shell := util.Question("Which shell is the container using?", []string{"bash", "ash"})
 			docker([]string{"exec", "-ti", strings.Split(answer, " - ")[0], shell})
 		case "env":
 			docker([]string{"exec", "-ti", strings.Split(answer, " - ")[0], "env"})

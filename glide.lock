@@ -1,5 +1,5 @@
 hash: 20c08a9d71ab0d279d9b5a2198bb5f897b0070769bd03953d228f6f6bf65c662
-updated: 2018-05-07T11:00:31.634846+02:00
+updated: 2018-05-07T11:32:13.777076+02:00
 imports:
 - name: github.com/AlecAivazis/survey
   version: e752db451e07e09c7d7dc8cada807a44bdb0fd47
@@ -14,7 +14,7 @@ imports:
 - name: github.com/mgutz/ansi
   version: 9520e82c474b0a04dd04f8a40959027271bab992
 - name: github.com/segersniels/goutil
-  version: e8f7525a729833a07d37789ab6eac200692ad3db
+  version: 429f739ed423ebe8c4fe3d238b2789061c364fbb
 - name: github.com/sirupsen/logrus
   version: c155da19408a8799da419ed3eeb0cb5db0ad5dbc
 - name: golang.org/x/crypto
