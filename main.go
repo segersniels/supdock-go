@@ -14,13 +14,19 @@ import (
 var psIds, psaIds, imageIds, psNames, psaNames, imageNames []string
 
 func initialise() {
-	psIds = strings.Split(util.ExecuteWithOutput("docker ps -q"), "\n")
-	psaIds = strings.Split(util.ExecuteWithOutput("docker ps -aq"), "\n")
-	imageIds = strings.Split(util.ExecuteWithOutput("docker images -q"), "\n")
+	ids, _ := util.ExecuteWithOutput("docker ps -q")
+	psIds = strings.Split(ids, "\n")
+	ids, _ = util.ExecuteWithOutput("docker ps -aq")
+	psaIds = strings.Split(ids, "\n")
+	ids, _ = util.ExecuteWithOutput("docker images -q")
+	imageIds = strings.Split(ids, "\n")
 
-	psNames = strings.Split(util.ExecuteWithOutput("docker ps |tail -n +2 |awk '{print $NF}'"), "\n")
-	psaNames = strings.Split(util.ExecuteWithOutput("docker ps -a |tail -n +2 |awk '{print $NF}'"), "\n")
-	imageNames = strings.Split(util.ExecuteWithOutput("docker images |tail -n +2 |awk '{print $1}'"), "\n")
+	names, _ := util.ExecuteWithOutput("docker ps |tail -n +2 |awk '{print $NF}'")
+	psNames = strings.Split(names, "\n")
+	names, _ = util.ExecuteWithOutput("docker ps -a |tail -n +2 |awk '{print $NF}'")
+	psaNames = strings.Split(names, "\n")
+	names, _ = util.ExecuteWithOutput("docker images |tail -n +2 |awk '{print $1}'")
+	imageNames = strings.Split(names, "\n")
 }
 
 func usage() {
