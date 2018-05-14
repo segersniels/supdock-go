@@ -13,10 +13,16 @@ Repetitive use of `docker ps`, `docker logs`, `docker stats` and `docker exec -t
 <img src="https://i.imgur.com/moY077k.gif" width="450">
 
 ## Installation
-Grab a binary from the [releases](https://github.com/segersniels/supdock-go/releases) page and move it into your desired `bin` location.
+Grab a binary from the [releases](https://github.com/segersniels/supdock-go/releases) page and move it into your desired `bin` (eg. `/usr/local/bin`) location.
 
+### OSX
 ```bash
-mv supdock_${VERSION}_${DISTRO}_amd64 /usr/local/bin/supdock
+version=$(curl --silent 'https://api.github.com/repos/segersniels/supdock-go/releases/latest' |grep tag_name |awk '{print $2}' |tr -d '\",v') ; curl -L "https://github.com/segersniels/supdock-go/releases/download/v${version}/supdock_${version}_darwin_amd64" > /usr/local/bin/supdock ; chmod +x /usr/local/bin/supdock
+```
+
+### Linux
+```bash
+version=$(curl --silent 'https://api.github.com/repos/segersniels/supdock-go/releases/latest' |grep tag_name |awk '{print $2}' |tr -d '\",v') ; curl -L "https://github.com/segersniels/supdock-go/releases/download/v${version}/supdock_${version}_linux_amd64" > /usr/local/bin/supdock ; chmod +x /usr/local/bin/supdock
 ```
 
 If you don't want to use `supdock` and `docker` separately you can just set an alias.
