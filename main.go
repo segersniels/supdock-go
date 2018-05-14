@@ -37,6 +37,7 @@ Options:
 
 Commands:
 	stop              Stop a running container
+	destroy           Stop all running containers
 	start             Start a stopped container
 	restart           Restart a running container
 	logs              See the logs of a container
@@ -55,7 +56,7 @@ Commands:
 
 func version() {
 	app := "supdock"
-	version := "0.1.2"
+	version := "0.1.2-rc.1"
 	fmt.Println(app, "version", version)
 }
 
@@ -140,6 +141,11 @@ func main() {
 			update()
 		case "prune":
 			err := util.Execute("docker system prune -f", []string{})
+			if err != nil {
+				util.Error(err)
+			}
+		case "destroy":
+			err := util.Execute("docker stop $(docker ps -q)", []string{})
 			if err != nil {
 				util.Error(err)
 			}
