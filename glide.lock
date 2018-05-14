@@ -1,8 +1,34 @@
 hash: 20c08a9d71ab0d279d9b5a2198bb5f897b0070769bd03953d228f6f6bf65c662
-updated: 2018-05-07T12:00:08.152969+02:00
+updated: 2018-05-14T16:41:24.224819+02:00
 imports:
 - name: github.com/AlecAivazis/survey
   version: e752db451e07e09c7d7dc8cada807a44bdb0fd47
+- name: github.com/davecgh/go-spew
+  version: 346938d642f2ec3594ed81d874461961cd0faa76
+  subpackages:
+  - spew
+- name: github.com/mattn/go-colorable
+  version: efa589957cd060542a26d2dd7832fd6a6c6c3ade
+- name: github.com/mattn/go-isatty
+  version: 6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c
+- name: github.com/mgutz/ansi
+  version: 9520e82c474b0a04dd04f8a40959027271bab992
 - name: github.com/segersniels/goutil
-  version: 429f739ed423ebe8c4fe3d238b2789061c364fbb
+  version: 1b141ad76d858b367a1d164ed98eb46998ac7b40
+- name: github.com/sirupsen/logrus
+  version: c155da19408a8799da419ed3eeb0cb5db0ad5dbc
+- name: golang.org/x/crypto
+  version: 034e5325b6ab92faa14d15c30e86919e911cf8e0
+  subpackages:
+  - ssh/terminal
+- name: golang.org/x/sys
+  version: 7c87d13f8e835d2fb3a70a2912c811ed0c1d241b
+  subpackages:
+  - unix
+  - windows
+- name: gopkg.in/AlecAivazis/survey.v1
+  version: e752db451e07e09c7d7dc8cada807a44bdb0fd47
+  subpackages:
+  - core
+  - terminal
 testImports: []

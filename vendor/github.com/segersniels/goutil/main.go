@@ -202,8 +202,8 @@ func Max(values []int) int {
 // ExecuteWithOutput : execute a command through bash -c and return the stdout
 func ExecuteWithOutput(command string) (string, error) {
 	cmd := exec.Command("bash", "-c", command)
-	var outbuf, errbuf bytes.Buffer
-	cmd.Stderr = &errbuf
+	var outbuf bytes.Buffer
+	cmd.Stderr = os.Stderr
 	cmd.Stdout = &outbuf
 	cmd.Stdin = os.Stdin
 	err := cmd.Run()
@@ -212,9 +212,8 @@ func ExecuteWithOutput(command string) (string, error) {
 
 // Execute : execute a command through bash -c, pass []string{} as env to ignore custom vars
 func Execute(command string, env []string) error {
-	var errbuf bytes.Buffer
 	cmd := exec.Command("bash", "-c", command)
-	cmd.Stderr = &errbuf
+	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
 	cmd.Stdin = os.Stdin
 	if len(env) > 0 {
