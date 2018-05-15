@@ -108,6 +108,16 @@ func execute(command string) {
 		prompt.Exec("stats", psIds, psNames, "Which container would you like to see that stats of?")
 	case "inspect":
 		prompt.Exec("inspect", psIds, psNames, "Which container would you like to inspect?")
+	case "prune":
+		err := util.Execute("docker system prune -f", []string{})
+		if err != nil {
+			util.Error(err)
+		}
+	case "destroy":
+		err := util.Execute("docker stop $(docker ps -q)", []string{})
+		if err != nil {
+			util.Error(err)
+		}
 	}
 }
 
@@ -128,6 +138,8 @@ func main() {
 		"history",
 		"restart",
 		"inspect",
+		"prune",
+		"destroy",
 	}
 	if util.Exists(commands, os.Args[1]) && len(os.Args) == 2 {
 		execute(os.Args[1])
@@ -139,16 +151,6 @@ func main() {
 			version()
 		case "latest", "update":
 			update()
-		case "prune":
-			err := util.Execute("docker system prune -f", []string{})
-			if err != nil {
-				util.Error(err)
-			}
-		case "destroy":
-			err := util.Execute("docker stop $(docker ps -q)", []string{})
-			if err != nil {
-				util.Error(err)
-			}
 		default:
 			cmd := exec.Command("docker", os.Args[1:]...)
 			cmd.Stderr = os.Stderr

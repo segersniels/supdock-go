@@ -18,10 +18,10 @@ func Warn(a ...interface{}) {
 	logrus.Warn(a...)
 }
 
-// Error : custom TTY error logging and throw exit code 0
+// Error : custom TTY error logging and throw exit code 1
 func Error(a ...interface{}) {
 	logrus.Error(a...)
-	os.Exit(0)
+	os.Exit(1)
 }
 
 // Fatal : custom TTY fatal logging
