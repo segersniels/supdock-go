@@ -49,6 +49,7 @@ Commands:
 	history           See the history of an image
 	history           Inspect a container
 	env               See the environment variables of a running container
+	memory            See the memory usage of all running containers
 	latest, update    Update to the latest version of supdock
 `
 	fmt.Println(output)
@@ -56,7 +57,7 @@ Commands:
 
 func version() {
 	app := "supdock"
-	version := "0.1.2-rc.2"
+	version := "0.1.3"
 	fmt.Println(app, "version", version)
 }
 
@@ -118,6 +119,11 @@ func execute(command string) {
 		if err != nil {
 			util.Error(err)
 		}
+	case "memory":
+		err := util.Execute("docker ps -q | xargs  docker stats --no-stream", []string{})
+		if err != nil {
+			util.Error(err)
+		}
 	}
 }
 
@@ -140,6 +146,7 @@ func main() {
 		"inspect",
 		"prune",
 		"destroy",
+		"memory",
 	}
 	if util.Exists(commands, os.Args[1]) && len(os.Args) == 2 {
 		execute(os.Args[1])

@@ -40,7 +40,7 @@ Options:
 
 Commands:
 	stop              Stop a running container
-  destroy           Stop all running containers
+	destroy           Stop all running containers
 	start             Start a stopped container
 	restart           Restart a running container
 	logs              See the logs of a container
@@ -50,8 +50,9 @@ Commands:
 	stats             See the stats of a container
 	ssh               SSH into a container
 	history           See the history of an image
-	inspect           Inspect a container
+	history           Inspect a container
 	env               See the environment variables of a running container
+	memory            See the memory usage of all running containers
 	latest, update    Update to the latest version of supdock
 ```
 
