@@ -57,7 +57,7 @@ Commands:
 ```
 
 ## Why a Go version?
-As I have a running docker container count in my prompt, every new line basically executes `docker ps -q |wc -l |tr -d ' '`. But because I also have `docker` aliased to `supdock` the execution time for this command was getting noticeably slower as it was being executed through `node.js`. Which is not really known for it's optimal performance as it's single threaded.
+As I have a running docker container count in my prompt, every new line basically executes `docker ps -q |wc -l |tr -d ' '`. And since I have `docker` aliased to `supdock` the execution time for this command was getting noticeably slower as it was being executed through `Node.js`. Which is not really known for it's optimal performance.
 
 ```bash
 supdock ps  0.33s user 0.07s system 103% cpu 0.390 total
