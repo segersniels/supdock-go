@@ -57,7 +57,7 @@ Commands:
 
 func version() {
 	app := "supdock"
-	version := "0.1.3"
+	version := "0.1.3-rc.1"
 	fmt.Println(app, "version", version)
 }
 
