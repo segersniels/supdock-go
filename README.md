@@ -31,31 +31,6 @@ If you don't want to use `supdock` and `docker` separately you can just set an a
 alias docker="supdock"
 ```
 
-## Usage
-```
-Usage: supdock [options] [command]
-
-Options:      
-  -h, --help         output usage information
-
-Commands:
-	stop              Stop a running container
-	destroy           Stop all running containers
-	start             Start a stopped container
-	restart           Restart a running container
-	logs              See the logs of a container
-	rm                Remove a container
-	rmi               Remove an image
-	prune             Remove stopped containers and dangling images
-	stats             See the stats of a container
-	ssh               SSH into a container
-	history           See the history of an image
-	history           Inspect a container
-	env               See the environment variables of a running container
-	memory            See the memory usage of all running containers
-	latest, update    Update to the latest version of supdock
-```
-
 ## Why a Go version?
 As I have a running docker container count in my prompt, every new line basically executes `docker ps -q |wc -l |tr -d ' '`. And since I have `docker` aliased to `supdock` the execution time for this command was getting noticeably slower as it was being executed through `Node.js`. Which is not really known for it's optimal performance.
 
