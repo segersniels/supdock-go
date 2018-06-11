@@ -3,3 +3,5 @@ import:
 - package: github.com/AlecAivazis/survey
   version: ^1.5.1
 - package: github.com/segersniels/goutil
+- package: github.com/urfave/cli
+  version: ^1.20.0

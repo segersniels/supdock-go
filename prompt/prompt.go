@@ -44,6 +44,8 @@ func Exec(command string, ids []string, names []string, question string) {
 			Docker([]string{"exec", "-ti", strings.Split(answer, " - ")[0], shell})
 		case "env":
 			Docker([]string{"exec", "-ti", strings.Split(answer, " - ")[0], "env"})
+		case "logs -f":
+			Docker([]string{"logs", "-f", strings.Split(answer, " - ")[0]})
 		default:
 			Docker([]string{command, strings.Split(answer, " - ")[0]})
 		}

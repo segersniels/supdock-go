@@ -1,5 +1,5 @@
-hash: 20c08a9d71ab0d279d9b5a2198bb5f897b0070769bd03953d228f6f6bf65c662
-updated: 2018-05-14T16:51:18.905014+02:00
+hash: b8215a7fd25d3c83d48036b73cc3de3c01045e5b8ff64b2ef30f4fd0ca28561d
+updated: 2018-06-11T12:08:35.196452+02:00
 imports:
 - name: github.com/AlecAivazis/survey
   version: e752db451e07e09c7d7dc8cada807a44bdb0fd47
@@ -17,12 +17,14 @@ imports:
   version: 564858d47f258e06f06d253df481bb789589757f
 - name: github.com/sirupsen/logrus
   version: c155da19408a8799da419ed3eeb0cb5db0ad5dbc
+- name: github.com/urfave/cli
+  version: cfb38830724cc34fedffe9a2a29fb54fa9169cd1
 - name: golang.org/x/crypto
-  version: 034e5325b6ab92faa14d15c30e86919e911cf8e0
+  version: 8ac0e0d97ce45cd83d1d7243c060cb8461dda5e9
   subpackages:
   - ssh/terminal
 - name: golang.org/x/sys
-  version: 7c87d13f8e835d2fb3a70a2912c811ed0c1d241b
+  version: bff228c7b664c5fce602223a05fb708fd8654986
   subpackages:
   - unix
   - windows
