@@ -84,7 +84,7 @@ func main() {
 			app := cli.NewApp()
 			app.Name = "supdock"
 			app.Usage = "What's Up Dock(er)?"
-			app.Version = "0.1.4-rc.1"
+			app.Version = "0.1.4-rc.2"
 			app.Commands = []cli.Command{
 				{
 					Name:  "logs",
