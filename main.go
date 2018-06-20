@@ -57,7 +57,6 @@ func docker() {
 func main() {
 	utilities := []string{"-h", "--help", "-v", "--version"}
 	commands := []string{
-		"update",
 		"latest",
 		"upgrade",
 		"logs",
@@ -84,7 +83,7 @@ func main() {
 			app := cli.NewApp()
 			app.Name = "supdock"
 			app.Usage = "What's Up Dock(er)?"
-			app.Version = "0.1.4-rc.2"
+			app.Version = "0.1.4-rc.3"
 			app.Commands = []cli.Command{
 				{
 					Name:  "logs",
@@ -383,9 +382,9 @@ func main() {
 					},
 				},
 				{
-					Name:    "update",
+					Name:    "latest",
 					Usage:   "Update to the latest version of supdock",
-					Aliases: []string{"latest", "upgrade"},
+					Aliases: []string{"upgrade"},
 					Action: func(c *cli.Context) error {
 						update()
 						return nil
