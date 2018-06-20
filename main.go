@@ -55,12 +55,7 @@ func docker() {
 }
 
 func main() {
-	utilities := []string{
-		"-h",
-		"--help",
-		"-v",
-		"--version",
-	}
+	utilities := []string{"-h", "--help", "-v", "--version"}
 	commands := []string{
 		"update",
 		"latest",
@@ -80,325 +75,330 @@ func main() {
 		"destroy",
 		"memory",
 	}
-	if util.Exists(commands, os.Args[1]) || util.Exists(utilities, os.Args[1]) {
-		if !util.Exists(utilities, os.Args[1]) {
-			initialise()
-		}
-		app := cli.NewApp()
-		app.Name = "supdock"
-		app.Usage = "What's Up Dock(er)?"
-		app.Version = "0.1.4-rc.1"
-		app.Commands = []cli.Command{
-			{
-				Name:  "logs",
-				Usage: "See the logs of a container",
-				Flags: []cli.Flag{
-					cli.BoolFlag{
-						Name:  "details",
-						Usage: "Show extra details provided to logs",
+
+	if len(os.Args) > 1 {
+		if util.Exists(commands, os.Args[1]) || util.Exists(utilities, os.Args[1]) {
+			if !util.Exists(utilities, os.Args[1]) {
+				initialise()
+			}
+			app := cli.NewApp()
+			app.Name = "supdock"
+			app.Usage = "What's Up Dock(er)?"
+			app.Version = "0.1.4-rc.1"
+			app.Commands = []cli.Command{
+				{
+					Name:  "logs",
+					Usage: "See the logs of a container",
+					Flags: []cli.Flag{
+						cli.BoolFlag{
+							Name:  "details",
+							Usage: "Show extra details provided to logs",
+						},
+						cli.BoolFlag{
+							Name:  "f, follow",
+							Usage: "Follow log output",
+						},
+						cli.StringFlag{
+							Name:  "since",
+							Usage: "Show logs since timestamp",
+						},
+						cli.StringFlag{
+							Name:  "tail",
+							Usage: "Number of lines to show from the end of the logs",
+						},
+						cli.BoolFlag{
+							Name:  "t, timestamps",
+							Usage: "Show timestamps",
+						},
+						cli.StringFlag{
+							Name:  "until",
+							Usage: "Show logs before a timestamp",
+						},
 					},
-					cli.BoolFlag{
-						Name:  "f, follow",
-						Usage: "Follow log output",
-					},
-					cli.StringFlag{
-						Name:  "since",
-						Usage: "Show logs since timestamp",
-					},
-					cli.StringFlag{
-						Name:  "tail",
-						Usage: "Number of lines to show from the end of the logs",
-					},
-					cli.BoolFlag{
-						Name:  "t, timestamps",
-						Usage: "Show timestamps",
-					},
-					cli.StringFlag{
-						Name:  "until",
-						Usage: "Show logs before a timestamp",
-					},
-				},
-				Action: func(c *cli.Context) error {
-					if len(c.Args()) == 0 {
-						if c.NumFlags() == 2 && c.Bool("f") {
-							prompt.Exec("logs -f", psaIds, psaNames, "Which container would you like to see the logs of?")
+					Action: func(c *cli.Context) error {
+						if len(c.Args()) == 0 {
+							if c.NumFlags() == 2 && c.Bool("f") {
+								prompt.Exec("logs -f", psaIds, psaNames, "Which container would you like to see the logs of?")
+							} else {
+								prompt.Exec("logs", psaIds, psaNames, "Which container would you like to see the logs of?")
+							}
 						} else {
-							prompt.Exec("logs", psaIds, psaNames, "Which container would you like to see the logs of?")
+							docker()
 						}
-					} else {
-						docker()
-					}
-					return nil
-				},
-			},
-			{
-				Name:  "start",
-				Usage: "Start a stopped container",
-				Flags: []cli.Flag{
-					cli.BoolFlag{
-						Name:  "a, attach",
-						Usage: "Attach STDOUT/STDERR and forward signals",
-					},
-					cli.StringFlag{
-						Name:  "checkpoint",
-						Usage: "Restore from this checkpoint",
-					},
-					cli.StringFlag{
-						Name:  "checkpoint-dir",
-						Usage: "Use a custom checkpoint storage directory",
-					},
-					cli.StringFlag{
-						Name:  "detach-keys",
-						Usage: "Override the key sequence for detaching",
-					},
-					cli.BoolFlag{
-						Name:  "i, interactive",
-						Usage: "Attach container's STDIN",
+						return nil
 					},
 				},
-				Action: func(c *cli.Context) error {
-					if len(c.Args()) == 0 && c.NumFlags() == 0 {
-						prompt.Exec("start", psaIds, psaNames, "Which container would you like to start?")
-					} else {
-						docker()
-					}
-					return nil
-				},
-			},
-			{
-				Name:  "restart",
-				Usage: "Restart a running container",
-				Flags: []cli.Flag{
-					cli.IntFlag{
-						Name:  "t, time",
-						Usage: "Seconds to wait for stop before killing the container",
+				{
+					Name:  "start",
+					Usage: "Start a stopped container",
+					Flags: []cli.Flag{
+						cli.BoolFlag{
+							Name:  "a, attach",
+							Usage: "Attach STDOUT/STDERR and forward signals",
+						},
+						cli.StringFlag{
+							Name:  "checkpoint",
+							Usage: "Restore from this checkpoint",
+						},
+						cli.StringFlag{
+							Name:  "checkpoint-dir",
+							Usage: "Use a custom checkpoint storage directory",
+						},
+						cli.StringFlag{
+							Name:  "detach-keys",
+							Usage: "Override the key sequence for detaching",
+						},
+						cli.BoolFlag{
+							Name:  "i, interactive",
+							Usage: "Attach container's STDIN",
+						},
+					},
+					Action: func(c *cli.Context) error {
+						if len(c.Args()) == 0 && c.NumFlags() == 0 {
+							prompt.Exec("start", psaIds, psaNames, "Which container would you like to start?")
+						} else {
+							docker()
+						}
+						return nil
 					},
 				},
-				Action: func(c *cli.Context) error {
-					if len(c.Args()) == 0 && c.NumFlags() == 0 {
-						prompt.Exec("restart", psIds, psNames, "Which container would you like to restart?")
-					} else {
-						docker()
-					}
-					return nil
-				},
-			},
-			{
-				Name:  "stop",
-				Usage: "Stop a running container",
-				Flags: []cli.Flag{
-					cli.IntFlag{
-						Name:  "t, time",
-						Usage: "Seconds to wait for stop before killing the container",
+				{
+					Name:  "restart",
+					Usage: "Restart a running container",
+					Flags: []cli.Flag{
+						cli.IntFlag{
+							Name:  "t, time",
+							Usage: "Seconds to wait for stop before killing the container",
+						},
+					},
+					Action: func(c *cli.Context) error {
+						if len(c.Args()) == 0 && c.NumFlags() == 0 {
+							prompt.Exec("restart", psIds, psNames, "Which container would you like to restart?")
+						} else {
+							docker()
+						}
+						return nil
 					},
 				},
-				Action: func(c *cli.Context) error {
-					if len(c.Args()) == 0 && c.NumFlags() == 0 {
-						prompt.Exec("stop", psIds, psNames, "Which container would you like to stop?")
-					} else {
-						docker()
-					}
-					return nil
-				},
-			},
-			{
-				Name:  "ssh",
-				Usage: "SSH into a container",
-				Action: func(c *cli.Context) error {
-					prompt.Exec("ssh", psIds, psNames, "Which container would you like to connect with?")
-					return nil
-				},
-			},
-			{
-				Name:  "env",
-				Usage: "See the environment variables of a running container",
-				Action: func(c *cli.Context) error {
-					prompt.Exec("env", psIds, psNames, "Which container would you like to see the environment variables of?")
-					return nil
-				},
-			},
-			{
-				Name:  "rm",
-				Usage: "Remove a container",
-				Flags: []cli.Flag{
-					cli.BoolFlag{
-						Name:  "f, force",
-						Usage: "Force the removal of a running container (uses SIGKILL)",
+				{
+					Name:  "stop",
+					Usage: "Stop a running container",
+					Flags: []cli.Flag{
+						cli.IntFlag{
+							Name:  "t, time",
+							Usage: "Seconds to wait for stop before killing the container",
+						},
 					},
-					cli.BoolFlag{
-						Name:  "l, link",
-						Usage: "Remove the specified link",
-					},
-					cli.BoolFlag{
-						Name:  "v, volumes",
-						Usage: "Remove the volumes associated with the container",
+					Action: func(c *cli.Context) error {
+						if len(c.Args()) == 0 && c.NumFlags() == 0 {
+							prompt.Exec("stop", psIds, psNames, "Which container would you like to stop?")
+						} else {
+							docker()
+						}
+						return nil
 					},
 				},
-				Action: func(c *cli.Context) error {
-					if len(c.Args()) == 0 && c.NumFlags() == 0 {
-						prompt.Exec("rm", psaIds, psaNames, "Which container would you like to remove?")
-					} else {
-						docker()
-					}
-					return nil
-				},
-			},
-			{
-				Name:  "rmi",
-				Usage: "Remove an image",
-				Flags: []cli.Flag{
-					cli.BoolFlag{
-						Name:  "f, force",
-						Usage: "Force removal of the image",
-					},
-					cli.BoolFlag{
-						Name:  "no-prune",
-						Usage: "Do not delete untagged parents",
+				{
+					Name:  "ssh",
+					Usage: "SSH into a container",
+					Action: func(c *cli.Context) error {
+						prompt.Exec("ssh", psIds, psNames, "Which container would you like to connect with?")
+						return nil
 					},
 				},
-				Action: func(c *cli.Context) error {
-					if len(c.Args()) == 0 && c.NumFlags() == 0 {
-						prompt.Exec("rmi", imageIds, imageNames, "Which image would you like to remove?")
-					} else {
-						docker()
-					}
-					return nil
-				},
-			},
-			{
-				Name:  "history",
-				Usage: "See the history of an image",
-				Flags: []cli.Flag{
-					cli.StringFlag{
-						Name:  "format",
-						Usage: "Pretty-print images using a Go template",
-					},
-					cli.BoolFlag{
-						Name:  "H, human",
-						Usage: "Print sizes and dates in human readable format",
-					},
-					cli.BoolFlag{
-						Name:  "no-trunc",
-						Usage: "Don't truncate output",
-					},
-					cli.BoolFlag{
-						Name:  "q, quiet",
-						Usage: "Only show numeric IDs",
+				{
+					Name:  "env",
+					Usage: "See the environment variables of a running container",
+					Action: func(c *cli.Context) error {
+						prompt.Exec("env", psIds, psNames, "Which container would you like to see the environment variables of?")
+						return nil
 					},
 				},
-				Action: func(c *cli.Context) error {
-					if len(c.Args()) == 0 && c.NumFlags() == 0 {
-						prompt.Exec("history", imageIds, imageNames, "Which image would you like to see the history of?")
-					} else {
-						docker()
-					}
-					return nil
-				},
-			},
-			{
-				Name:  "stats",
-				Usage: "See the stats of a container",
-				Flags: []cli.Flag{
-					cli.BoolFlag{
-						Name:  "a, all",
-						Usage: "Show all containers (default shows just running)",
+				{
+					Name:  "rm",
+					Usage: "Remove a container",
+					Flags: []cli.Flag{
+						cli.BoolFlag{
+							Name:  "f, force",
+							Usage: "Force the removal of a running container (uses SIGKILL)",
+						},
+						cli.BoolFlag{
+							Name:  "l, link",
+							Usage: "Remove the specified link",
+						},
+						cli.BoolFlag{
+							Name:  "v, volumes",
+							Usage: "Remove the volumes associated with the container",
+						},
 					},
-					cli.StringFlag{
-						Name:  "format",
-						Usage: "Pretty-print images using a Go template",
-					},
-					cli.BoolFlag{
-						Name:  "no-stream",
-						Usage: "Disable streaming stats and only pull the first",
-					},
-					cli.BoolFlag{
-						Name:  "no-trunc",
-						Usage: "Do not truncate output",
+					Action: func(c *cli.Context) error {
+						if len(c.Args()) == 0 && c.NumFlags() == 0 {
+							prompt.Exec("rm", psaIds, psaNames, "Which container would you like to remove?")
+						} else {
+							docker()
+						}
+						return nil
 					},
 				},
-				Action: func(c *cli.Context) error {
-					if len(c.Args()) == 0 && c.NumFlags() == 0 {
-						prompt.Exec("stats", psIds, psNames, "Which container would you like to see that stats of?")
-					} else {
-						docker()
-					}
-					return nil
-				},
-			},
-			{
-				Name:  "inspect",
-				Usage: "Inspect a container",
-				Flags: []cli.Flag{
-					cli.StringFlag{
-						Name:  "f, format",
-						Usage: "Format the output using the given Go template",
+				{
+					Name:  "rmi",
+					Usage: "Remove an image",
+					Flags: []cli.Flag{
+						cli.BoolFlag{
+							Name:  "f, force",
+							Usage: "Force removal of the image",
+						},
+						cli.BoolFlag{
+							Name:  "no-prune",
+							Usage: "Do not delete untagged parents",
+						},
 					},
-					cli.BoolFlag{
-						Name:  "s, size",
-						Usage: "Display total file sizes if the type is container",
-					},
-					cli.StringFlag{
-						Name:  "type",
-						Usage: "Return JSON for specified type",
+					Action: func(c *cli.Context) error {
+						if len(c.Args()) == 0 && c.NumFlags() == 0 {
+							prompt.Exec("rmi", imageIds, imageNames, "Which image would you like to remove?")
+						} else {
+							docker()
+						}
+						return nil
 					},
 				},
-				Action: func(c *cli.Context) error {
-					if len(c.Args()) == 0 && c.NumFlags() == 0 {
-						prompt.Exec("inspect", psIds, psNames, "Which container would you like to inspect?")
-					} else {
-						docker()
-					}
-					return nil
+				{
+					Name:  "history",
+					Usage: "See the history of an image",
+					Flags: []cli.Flag{
+						cli.StringFlag{
+							Name:  "format",
+							Usage: "Pretty-print images using a Go template",
+						},
+						cli.BoolFlag{
+							Name:  "H, human",
+							Usage: "Print sizes and dates in human readable format",
+						},
+						cli.BoolFlag{
+							Name:  "no-trunc",
+							Usage: "Don't truncate output",
+						},
+						cli.BoolFlag{
+							Name:  "q, quiet",
+							Usage: "Only show numeric IDs",
+						},
+					},
+					Action: func(c *cli.Context) error {
+						if len(c.Args()) == 0 && c.NumFlags() == 0 {
+							prompt.Exec("history", imageIds, imageNames, "Which image would you like to see the history of?")
+						} else {
+							docker()
+						}
+						return nil
+					},
 				},
-			},
-			{
-				Name:  "prune",
-				Usage: "Remove stopped containers and dangling images",
-				Action: func(c *cli.Context) error {
-					err := util.Execute("docker system prune -f", []string{})
-					if err != nil {
-						util.Error(err)
-					}
-					return nil
+				{
+					Name:  "stats",
+					Usage: "See the stats of a container",
+					Flags: []cli.Flag{
+						cli.BoolFlag{
+							Name:  "a, all",
+							Usage: "Show all containers (default shows just running)",
+						},
+						cli.StringFlag{
+							Name:  "format",
+							Usage: "Pretty-print images using a Go template",
+						},
+						cli.BoolFlag{
+							Name:  "no-stream",
+							Usage: "Disable streaming stats and only pull the first",
+						},
+						cli.BoolFlag{
+							Name:  "no-trunc",
+							Usage: "Do not truncate output",
+						},
+					},
+					Action: func(c *cli.Context) error {
+						if len(c.Args()) == 0 && c.NumFlags() == 0 {
+							prompt.Exec("stats", psIds, psNames, "Which container would you like to see that stats of?")
+						} else {
+							docker()
+						}
+						return nil
+					},
 				},
-			},
-			{
-				Name:    "destroy",
-				Usage:   "Stop all running containers",
-				Aliases: []string{"shutdown"},
-				Action: func(c *cli.Context) error {
-					err := util.Execute("docker stop $(docker ps -q)", []string{})
-					if err != nil {
-						util.Error(err)
-					}
-					return nil
+				{
+					Name:  "inspect",
+					Usage: "Inspect a container",
+					Flags: []cli.Flag{
+						cli.StringFlag{
+							Name:  "f, format",
+							Usage: "Format the output using the given Go template",
+						},
+						cli.BoolFlag{
+							Name:  "s, size",
+							Usage: "Display total file sizes if the type is container",
+						},
+						cli.StringFlag{
+							Name:  "type",
+							Usage: "Return JSON for specified type",
+						},
+					},
+					Action: func(c *cli.Context) error {
+						if len(c.Args()) == 0 && c.NumFlags() == 0 {
+							prompt.Exec("inspect", psIds, psNames, "Which container would you like to inspect?")
+						} else {
+							docker()
+						}
+						return nil
+					},
 				},
-			},
-			{
-				Name:  "memory",
-				Usage: "See the memory usage of all running containers",
-				Action: func(c *cli.Context) error {
-					err := util.Execute("docker ps -q | xargs  docker stats --no-stream", []string{})
-					if err != nil {
-						util.Error(err)
-					}
-					return nil
+				{
+					Name:  "prune",
+					Usage: "Remove stopped containers and dangling images",
+					Action: func(c *cli.Context) error {
+						err := util.Execute("docker system prune -f", []string{})
+						if err != nil {
+							util.Error(err)
+						}
+						return nil
+					},
 				},
-			},
-			{
-				Name:    "update",
-				Usage:   "Update to the latest version of supdock",
-				Aliases: []string{"latest", "upgrade"},
-				Action: func(c *cli.Context) error {
-					update()
-					return nil
+				{
+					Name:    "destroy",
+					Usage:   "Stop all running containers",
+					Aliases: []string{"shutdown"},
+					Action: func(c *cli.Context) error {
+						err := util.Execute("docker stop $(docker ps -q)", []string{})
+						if err != nil {
+							util.Error(err)
+						}
+						return nil
+					},
 				},
-			},
-		}
-		err := app.Run(os.Args)
-		if err != nil {
-			util.Warn(err)
-			os.Exit(0)
+				{
+					Name:  "memory",
+					Usage: "See the memory usage of all running containers",
+					Action: func(c *cli.Context) error {
+						err := util.Execute("docker ps -q | xargs  docker stats --no-stream", []string{})
+						if err != nil {
+							util.Error(err)
+						}
+						return nil
+					},
+				},
+				{
+					Name:    "update",
+					Usage:   "Update to the latest version of supdock",
+					Aliases: []string{"latest", "upgrade"},
+					Action: func(c *cli.Context) error {
+						update()
+						return nil
+					},
+				},
+			}
+			err := app.Run(os.Args)
+			if err != nil {
+				util.Warn(err)
+				os.Exit(0)
+			}
+		} else {
+			docker()
 		}
 	} else {
 		docker()
