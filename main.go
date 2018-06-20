@@ -21,7 +21,6 @@ func initialise() {
 	psaIds = strings.Split(ids, "\n")
 	ids, _ = util.ExecuteWithOutput("docker images -q")
 	imageIds = strings.Split(ids, "\n")
-
 	names, _ := util.ExecuteWithOutput("docker ps |tail -n +2 |awk '{print $NF}'")
 	psNames = strings.Split(names, "\n")
 	names, _ = util.ExecuteWithOutput("docker ps -a |tail -n +2 |awk '{print $NF}'")
@@ -56,11 +55,13 @@ func docker() {
 }
 
 func main() {
-	commands := []string{
+	utilities := []string{
 		"-h",
 		"--help",
 		"-v",
 		"--version",
+	}
+	commands := []string{
 		"update",
 		"latest",
 		"upgrade",
@@ -79,12 +80,14 @@ func main() {
 		"destroy",
 		"memory",
 	}
-	if util.Exists(commands, os.Args[1]) {
-		initialise()
+	if util.Exists(commands, os.Args[1]) || util.Exists(utilities, os.Args[1]) {
+		if !util.Exists(utilities, os.Args[1]) {
+			initialise()
+		}
 		app := cli.NewApp()
 		app.Name = "supdock"
 		app.Usage = "What's Up Dock(er)?"
-		app.Version = "0.1.4"
+		app.Version = "0.1.4-rc.1"
 		app.Commands = []cli.Command{
 			{
 				Name:  "logs",
