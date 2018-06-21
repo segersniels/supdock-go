@@ -72,6 +72,7 @@ func main() {
 		"inspect",
 		"prune",
 		"destroy",
+		"shutdown",
 		"memory",
 	}
 
@@ -83,7 +84,7 @@ func main() {
 			app := cli.NewApp()
 			app.Name = "supdock"
 			app.Usage = "What's Up Dock(er)?"
-			app.Version = "0.1.4-rc.3"
+			app.Version = "0.1.4-rc.4"
 			app.Commands = []cli.Command{
 				{
 					Name:  "logs",
