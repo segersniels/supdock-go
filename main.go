@@ -312,9 +312,13 @@ func main() {
 							Name:  "no-trunc",
 							Usage: "Do not truncate output",
 						},
+						cli.BoolFlag{
+							Name:  "s, select",
+							Usage: "Select the container from a select prompt",
+						},
 					},
 					Action: func(c *cli.Context) error {
-						if len(c.Args()) == 0 && c.NumFlags() == 0 {
+						if len(c.Args()) == 0 && c.Bool("s") {
 							prompt.Exec("stats", psIds, psNames, "Which container would you like to see that stats of?")
 						} else {
 							docker()
