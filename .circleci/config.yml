@@ -1,6 +1,6 @@
 version: 2
 defaults: &defaults
-  working_directory: /go/src/github.com/segersniels/supdock-go
+  working_directory: /go/src/github.com/segersniels/supdock
   docker:
     - image: circleci/golang
 
