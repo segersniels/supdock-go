@@ -20,8 +20,9 @@ func (c CLI) Run() {
 	app.Commands = c.Commands
 
 	names := command.ExtractNames(c.Commands)
+	utils := []string{"-h", "--help", "-v", "--version"}
 
-	if len(os.Args) > 1 && util.Exists(names, os.Args[1]) {
+	if len(os.Args) > 1 && (util.Exists(names, os.Args[1]) || util.Exists(utils, os.Args[1])) {
 		err := app.Run(os.Args)
 		if err != nil {
 			util.Warn(err)

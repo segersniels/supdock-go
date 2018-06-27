@@ -10,13 +10,6 @@ func ExtractNames(commands []cli.Command) []string {
 	for _, command := range commands {
 		names = append(names, command.Name)
 	}
-
-	// Prevent supdock passthrough to docker for the following commands, they should be handled by our CLI
-	utils := []string{"-h", "--help", "-v", "--version"}
-	for _, command := range utils {
-		names = append(names, command)
-	}
-
 	return names
 }
 
