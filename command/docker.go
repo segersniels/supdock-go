@@ -1,4 +1,4 @@
-package prompt
+package command
 
 import (
 	"bytes"
@@ -9,8 +9,19 @@ import (
 	"github.com/segersniels/goutil"
 )
 
-// Docker : standard docker execution
-func Docker(args []string) {
+// PassThrough : passthrough docker execution
+func PassThrough() {
+	cmd := exec.Command("docker", os.Args[1:]...)
+	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
+	cmd.Stdin = os.Stdin
+	err := cmd.Run()
+	if err != nil {
+		util.Error(err)
+	}
+}
+
+func docker(args []string) {
 	var errbuf bytes.Buffer
 	cmd := exec.Command("docker", args...)
 	cmd.Stderr = &errbuf
@@ -33,21 +44,20 @@ func constructChoices(ids []string, names []string) []string {
 	return choices
 }
 
-// Exec : specify the execution
-func Exec(command string, ids []string, names []string, question string) {
+func execute(command string, ids []string, names []string, question string) {
 	if len(ids) > 1 && len(names) > 1 {
 		options := constructChoices(ids, names)
 		answer := util.Question(question, options)
 		switch command {
 		case "ssh":
 			shell := util.Question("Which shell is the container using?", []string{"bash", "ash"})
-			Docker([]string{"exec", "-ti", strings.Split(answer, " - ")[0], shell})
+			docker([]string{"exec", "-ti", strings.Split(answer, " - ")[0], shell})
 		case "env":
-			Docker([]string{"exec", "-ti", strings.Split(answer, " - ")[0], "env"})
+			docker([]string{"exec", "-ti", strings.Split(answer, " - ")[0], "env"})
 		case "logs -f":
-			Docker([]string{"logs", "-f", strings.Split(answer, " - ")[0]})
+			docker([]string{"logs", "-f", strings.Split(answer, " - ")[0]})
 		default:
-			Docker([]string{command, strings.Split(answer, " - ")[0]})
+			docker([]string{command, strings.Split(answer, " - ")[0]})
 		}
 	} else {
 		util.Warn("No options found to construct prompt")
