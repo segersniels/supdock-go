@@ -1,5 +1,5 @@
 # Supdock
-[![CircleCI](https://circleci.com/gh/segersniels/supdock-go/tree/master.svg?style=shield)](https://circleci.com/gh/segersniels/supdock-go/tree/master)
+[![CircleCI](https://circleci.com/gh/segersniels/supdock/tree/master.svg?style=shield)](https://circleci.com/gh/segersniels/supdock/tree/master)
 
 What's Up, Dock(er)? A slightly more visual way to interact with the docker daemon. Supdock is a wrapper for the docker command meaning you can still use all of the other `docker` commands without issues.
 
