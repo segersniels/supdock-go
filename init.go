@@ -1,4 +1,4 @@
-package command
+package main
 
 import (
 	"os"
@@ -7,10 +7,8 @@ import (
 	util "github.com/segersniels/goutil"
 )
 
-var psIds, psaIds, imageIds, psNames, psaNames, imageNames []string
-
 func init() {
-	names := ExtractNames(Commands())
+	names := extractNames(commands())
 	utils := []string{"-h", "--help", "-v", "--version"}
 	if len(os.Args) > 1 && util.Exists(names, os.Args[1]) && !util.Exists(utils, os.Args[1]) {
 		ids, _ := util.ExecuteWithOutput("docker ps -q")

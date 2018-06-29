@@ -1,11 +1,41 @@
-package command
+package main
 
 import (
+	"bytes"
+	"os"
+	"os/exec"
+	"strings"
+
 	util "github.com/segersniels/goutil"
 	"github.com/urfave/cli"
 )
 
-func ExtractNames(commands []cli.Command) []string {
+var psIds, psaIds, imageIds, psNames, psaNames, imageNames []string
+
+func passThrough() {
+	cmd := exec.Command("docker", os.Args[1:]...)
+	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
+	cmd.Stdin = os.Stdin
+	err := cmd.Run()
+	if err != nil {
+		util.Error(err)
+	}
+}
+
+func docker(args []string) {
+	var errbuf bytes.Buffer
+	cmd := exec.Command("docker", args...)
+	cmd.Stderr = &errbuf
+	cmd.Stdout = os.Stdout
+	cmd.Stdin = os.Stdin
+	err := cmd.Run()
+	if err != nil {
+		util.Error(strings.TrimSpace(errbuf.String()))
+	}
+}
+
+func extractNames(commands []cli.Command) []string {
 	var names []string
 	for _, command := range commands {
 		names = append(names, command.Name)
@@ -13,7 +43,38 @@ func ExtractNames(commands []cli.Command) []string {
 	return names
 }
 
-func Commands() []cli.Command {
+func constructChoices(ids []string, names []string) []string {
+	choices := []string{}
+	for index, id := range ids {
+		choice := id + " - " + names[index]
+		if choice != " - " {
+			choices = append(choices, choice)
+		}
+	}
+	return choices
+}
+
+func execute(command string, ids []string, names []string, question string) {
+	if len(ids) > 1 && len(names) > 1 {
+		options := constructChoices(ids, names)
+		answer := util.Question(question, options)
+		switch command {
+		case "ssh":
+			shell := util.Question("Which shell is the container using?", []string{"bash", "ash"})
+			docker([]string{"exec", "-ti", strings.Split(answer, " - ")[0], shell})
+		case "env":
+			docker([]string{"exec", "-ti", strings.Split(answer, " - ")[0], "env"})
+		case "logs -f":
+			docker([]string{"logs", "-f", strings.Split(answer, " - ")[0]})
+		default:
+			docker([]string{command, strings.Split(answer, " - ")[0]})
+		}
+	} else {
+		util.Warn("No options found to construct prompt")
+	}
+}
+
+func commands() []cli.Command {
 	return []cli.Command{
 		{
 			Name:  "logs",
@@ -52,7 +113,7 @@ func Commands() []cli.Command {
 						execute("logs", psaIds, psaNames, "Which container would you like to see the logs of?")
 					}
 				} else {
-					PassThrough()
+					passThrough()
 				}
 				return nil
 			},
@@ -86,7 +147,7 @@ func Commands() []cli.Command {
 				if len(c.Args()) == 0 && c.NumFlags() == 0 {
 					execute("start", psaIds, psaNames, "Which container would you like to start?")
 				} else {
-					PassThrough()
+					passThrough()
 				}
 				return nil
 			},
@@ -104,7 +165,7 @@ func Commands() []cli.Command {
 				if len(c.Args()) == 0 && c.NumFlags() == 0 {
 					execute("restart", psIds, psNames, "Which container would you like to restart?")
 				} else {
-					PassThrough()
+					passThrough()
 				}
 				return nil
 			},
@@ -122,7 +183,7 @@ func Commands() []cli.Command {
 				if len(c.Args()) == 0 && c.NumFlags() == 0 {
 					execute("stop", psIds, psNames, "Which container would you like to stop?")
 				} else {
-					PassThrough()
+					passThrough()
 				}
 				return nil
 			},
@@ -164,7 +225,7 @@ func Commands() []cli.Command {
 				if len(c.Args()) == 0 && c.NumFlags() == 0 {
 					execute("rm", psaIds, psaNames, "Which container would you like to remove?")
 				} else {
-					PassThrough()
+					passThrough()
 				}
 				return nil
 			},
@@ -186,7 +247,7 @@ func Commands() []cli.Command {
 				if len(c.Args()) == 0 && c.NumFlags() == 0 {
 					execute("rmi", imageIds, imageNames, "Which image would you like to remove?")
 				} else {
-					PassThrough()
+					passThrough()
 				}
 				return nil
 			},
@@ -216,7 +277,7 @@ func Commands() []cli.Command {
 				if len(c.Args()) == 0 && c.NumFlags() == 0 {
 					execute("history", imageIds, imageNames, "Which image would you like to see the history of?")
 				} else {
-					PassThrough()
+					passThrough()
 				}
 				return nil
 			},
@@ -250,7 +311,7 @@ func Commands() []cli.Command {
 				if len(c.Args()) == 0 && c.Bool("s") {
 					execute("stats", psIds, psNames, "Which container would you like to see that stats of?")
 				} else {
-					PassThrough()
+					passThrough()
 				}
 				return nil
 			},
@@ -276,7 +337,7 @@ func Commands() []cli.Command {
 				if len(c.Args()) == 0 && c.NumFlags() == 0 {
 					execute("inspect", psIds, psNames, "Which container would you like to inspect?")
 				} else {
-					PassThrough()
+					passThrough()
 				}
 				return nil
 			},
