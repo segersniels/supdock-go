@@ -8,9 +8,9 @@ import (
 )
 
 func init() {
-	names := extractNames(commands())
-	utils := []string{"-h", "--help", "-v", "--version"}
-	if len(os.Args) > 1 && util.Exists(names, os.Args[1]) && !util.Exists(utils, os.Args[1]) {
+	commandNames := extractNames(commands())
+	utilNames := []string{"-h", "--help", "-v", "--version"}
+	if len(os.Args) > 1 && util.Exists(commandNames, os.Args[1]) && !util.Exists(utilNames, os.Args[1]) {
 		ids, _ := util.ExecuteWithOutput("docker ps -q")
 		psIds = strings.Split(ids, "\n")
 		ids, _ = util.ExecuteWithOutput("docker ps -aq")

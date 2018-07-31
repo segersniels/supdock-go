@@ -11,13 +11,13 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "supdock"
 	app.Usage = "What's Up Dock(er)?"
-	app.Version = "0.1.5"
+	app.Version = "0.1.5-rc.1"
 	app.Commands = commands()
 
-	names := extractNames(app.Commands)
-	utils := []string{"-h", "--help", "-v", "--version"}
+	commandNames := extractNames(app.Commands)
+	utilNames := []string{"-h", "--help", "-v", "--version"}
 
-	if len(os.Args) > 1 && (util.Exists(names, os.Args[1]) || util.Exists(utils, os.Args[1])) {
+	if len(os.Args) > 1 && (util.Exists(commandNames, os.Args[1]) || util.Exists(utilNames, os.Args[1])) {
 		err := app.Run(os.Args)
 		if err != nil {
 			util.Warn(err)

@@ -39,6 +39,9 @@ func extractNames(commands []cli.Command) []string {
 	var names []string
 	for _, command := range commands {
 		names = append(names, command.Name)
+		for _, alias := range command.Aliases {
+			names = append(names, alias)
+		}
 	}
 	return names
 }
