@@ -14,16 +14,12 @@ Supdock also tries to expand on the basic docker commands adding custom commands
 <img src="https://i.imgur.com/moY077k.gif" width="450">
 
 ## Installation
+### Binary
 Grab a binary from the [releases](https://github.com/segersniels/supdock-go/releases) page and move it into your desired `bin` (eg. `/usr/local/bin`) location.
 
-### OSX
+### Go
 ```bash
-version=$(curl --silent 'https://api.github.com/repos/segersniels/supdock-go/releases/latest' |grep tag_name |awk '{print $2}' |tr -d '\",v') ; curl -L "https://github.com/segersniels/supdock-go/releases/download/v${version}/supdock_${version}_darwin_amd64" > /usr/local/bin/supdock ; chmod +x /usr/local/bin/supdock
-```
-
-### Linux
-```bash
-version=$(curl --silent 'https://api.github.com/repos/segersniels/supdock-go/releases/latest' |grep tag_name |awk '{print $2}' |tr -d '\",v') ; curl -L "https://github.com/segersniels/supdock-go/releases/download/v${version}/supdock_${version}_linux_amd64" > /usr/local/bin/supdock ; chmod +x /usr/local/bin/supdock
+go get -u github.com/segersniels/supdock
 ```
 
 If you don't want to use `supdock` and `docker` separately you can just set an alias.
