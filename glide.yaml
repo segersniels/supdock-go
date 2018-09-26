@@ -5,3 +5,5 @@ import:
 - package: github.com/segersniels/goutil
 - package: github.com/urfave/cli
   version: ^1.20.0
+- package: github.com/docker/docker
+  version: ^17.5.0-ce-rc3

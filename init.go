@@ -1,27 +1,51 @@
 package main
 
 import (
+	"context"
 	"os"
 	"strings"
 
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/client"
 	util "github.com/segersniels/goutil"
 )
+
+var psIds, psaIds, imageIds, psNames, psaNames, imageNames []string
+var docker *client.Client
+
+func getContainerInformation(cli *client.Client, all bool) ([]string, []string) {
+	var ids, names []string
+	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{All: all})
+	if err != nil {
+		util.Error(err)
+	}
+	for _, container := range containers {
+		ids = append(ids, container.ID[0:12])
+		names = append(names, container.Names...)
+	}
+	return ids, names
+}
+
+func getImageInformation(cli *client.Client) ([]string, []string) {
+	var ids, names []string
+	images, err := cli.ImageList(context.Background(), types.ImageListOptions{})
+	if err != nil {
+		util.Error(err)
+	}
+	for _, image := range images {
+		ids = append(ids, strings.SplitAfter(image.ID, ":")[1][0:12])
+		names = append(names, image.RepoTags...)
+	}
+	return ids, names
+}
 
 func init() {
 	commandNames := extractNames(commands())
 	utilNames := []string{"-h", "--help", "-v", "--version"}
 	if len(os.Args) > 1 && util.Exists(commandNames, os.Args[1]) && !util.Exists(utilNames, os.Args[1]) {
-		ids, _ := util.ExecuteWithOutput("docker ps -q")
-		psIds = strings.Split(ids, "\n")
-		ids, _ = util.ExecuteWithOutput("docker ps -aq")
-		psaIds = strings.Split(ids, "\n")
-		ids, _ = util.ExecuteWithOutput("docker images -q")
-		imageIds = strings.Split(ids, "\n")
-		names, _ := util.ExecuteWithOutput("docker ps |tail -n +2 |awk '{print $NF}'")
-		psNames = strings.Split(names, "\n")
-		names, _ = util.ExecuteWithOutput("docker ps -a |tail -n +2 |awk '{print $NF}'")
-		psaNames = strings.Split(names, "\n")
-		names, _ = util.ExecuteWithOutput("docker images |tail -n +2 |awk '{print $1}'")
-		imageNames = strings.Split(names, "\n")
+		docker, _ = client.NewEnvClient()
+		psIds, psNames = getContainerInformation(docker, false)
+		psaIds, psaNames = getContainerInformation(docker, true)
+		imageIds, imageNames = getImageInformation(docker)
 	}
 }

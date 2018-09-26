@@ -10,8 +10,6 @@ import (
 	"github.com/urfave/cli"
 )
 
-var psIds, psaIds, imageIds, psNames, psaNames, imageNames []string
-
 func passThroughDocker() {
 	cmd := exec.Command("docker", os.Args[1:]...)
 	cmd.Stderr = os.Stderr
@@ -58,19 +56,20 @@ func constructChoices(ids []string, names []string) []string {
 }
 
 func execute(command string, ids []string, names []string, question string) {
-	if len(ids) > 1 && len(names) > 1 {
+	if len(ids) >= 1 && len(names) >= 1 {
 		options := constructChoices(ids, names)
 		answer := util.Question(question, options)
+		id := strings.Split(answer, " - ")[0]
 		switch command {
 		case "ssh":
 			shell := util.Question("Which shell is the container using?", []string{"bash", "ash"})
-			customDocker([]string{"exec", "-ti", strings.Split(answer, " - ")[0], shell})
+			customDocker([]string{"exec", "-ti", id, shell})
 		case "env":
-			customDocker([]string{"exec", "-ti", strings.Split(answer, " - ")[0], "env"})
+			customDocker([]string{"exec", "-ti", id, "env"})
 		case "logs -f":
-			customDocker([]string{"logs", "-f", strings.Split(answer, " - ")[0]})
+			customDocker([]string{"logs", "-f", id})
 		default:
-			customDocker([]string{command, strings.Split(answer, " - ")[0]})
+			customDocker([]string{command, id})
 		}
 	} else {
 		util.Warn("No options found to construct prompt")

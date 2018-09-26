@@ -1,35 +1,39 @@
-hash: b8215a7fd25d3c83d48036b73cc3de3c01045e5b8ff64b2ef30f4fd0ca28561d
-updated: 2018-06-11T12:08:35.196452+02:00
+hash: f4abc57356ed62cce7b45e0356c624cb3572d54f156c29801eecb51309fa60d7
+updated: 2018-09-26T14:50:43.789402+02:00
 imports:
 - name: github.com/AlecAivazis/survey
-  version: e752db451e07e09c7d7dc8cada807a44bdb0fd47
+  version: f30c5d1830c892f533140f29a1de89141dc217f5
 - name: github.com/davecgh/go-spew
-  version: 346938d642f2ec3594ed81d874461961cd0faa76
+  version: 8991bc29aa16c548c550c7ff78260e27b9ab7c73
   subpackages:
   - spew
+- name: github.com/docker/docker
+  version: 90d35abf7b3535c1c319c872900fbd76374e521c
+- name: github.com/kballard/go-shellquote
+  version: 95032a82bc518f77982ea72343cc1ade730072f0
 - name: github.com/mattn/go-colorable
   version: efa589957cd060542a26d2dd7832fd6a6c6c3ade
 - name: github.com/mattn/go-isatty
-  version: 6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c
+  version: 3fb116b820352b7f0c281308a4d6250c22d94e27
 - name: github.com/mgutz/ansi
   version: 9520e82c474b0a04dd04f8a40959027271bab992
 - name: github.com/segersniels/goutil
   version: 564858d47f258e06f06d253df481bb789589757f
 - name: github.com/sirupsen/logrus
-  version: c155da19408a8799da419ed3eeb0cb5db0ad5dbc
+  version: 3e01752db0189b9157070a0e1668a620f9a85da2
 - name: github.com/urfave/cli
   version: cfb38830724cc34fedffe9a2a29fb54fa9169cd1
 - name: golang.org/x/crypto
-  version: 8ac0e0d97ce45cd83d1d7243c060cb8461dda5e9
+  version: 0e37d006457bf46f9e6692014ba72ef82c33022c
   subpackages:
   - ssh/terminal
 - name: golang.org/x/sys
-  version: bff228c7b664c5fce602223a05fb708fd8654986
+  version: b09afc3d579e346c4a7e4705953acaf6f9e551bd
   subpackages:
   - unix
   - windows
 - name: gopkg.in/AlecAivazis/survey.v1
-  version: e752db451e07e09c7d7dc8cada807a44bdb0fd47
+  version: f30c5d1830c892f533140f29a1de89141dc217f5
   subpackages:
   - core
   - terminal
