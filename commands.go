@@ -407,13 +407,11 @@ func commands() []cli.Command {
 				},
 			},
 			Action: func(c *cli.Context) error {
-				if len(c.Args()) == 0 {
-					if c.Bool("s") {
-						if c.Bool("no-stream") {
-							execute("stats --no-stream", psIds, psNames, "Which container would you like to see the stats of?")
-						} else {
-							execute("stats", psIds, psNames, "Which container would you like to see the stats of?")
-						}
+				if c.Bool("s") {
+					if c.Bool("no-stream") {
+						execute("stats --no-stream", psIds, psNames, "Which container would you like to see the stats of?")
+					} else {
+						execute("stats", psIds, psNames, "Which container would you like to see the stats of?")
 					}
 				} else {
 					passThroughDocker()
