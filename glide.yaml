@@ -1,9 +1,17 @@
 package: github.com/segersniels/supdock
 import:
 - package: github.com/AlecAivazis/survey
-  version: ^1.5.1
-- package: github.com/segersniels/goutil
-- package: github.com/urfave/cli
-  version: ^1.20.0
+  version: ^1.6.2
 - package: github.com/docker/docker
   version: ^17.5.0-ce-rc3
+  subpackages:
+  - api/types
+  - client
+- package: github.com/urfave/cli
+  version: ^1.20.0
+- package: github.com/sirupsen/logrus
+  version: master
+- package: github.com/Sirupsen/logrus
+  repo: git@github.com:/sirupsen/logrus
+  vcs: git
+  version: master

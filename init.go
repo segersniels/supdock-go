@@ -5,9 +5,10 @@ import (
 	"os"
 	"strings"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
-	util "github.com/segersniels/goutil"
 )
 
 var psIds, psaIds, imageIds, psNames, psaNames, imageNames []string
@@ -17,7 +18,7 @@ func getContainerInformation(cli *client.Client, all bool) ([]string, []string) 
 	var ids, names []string
 	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{All: all})
 	if err != nil {
-		util.Error(err)
+		log.Fatal(err)
 	}
 	for _, container := range containers {
 		ids = append(ids, container.ID[0:12])
@@ -30,7 +31,7 @@ func getImageInformation(cli *client.Client) ([]string, []string) {
 	var ids, names []string
 	images, err := cli.ImageList(context.Background(), types.ImageListOptions{})
 	if err != nil {
-		util.Error(err)
+		log.Fatal(err)
 	}
 	for _, image := range images {
 		ids = append(ids, strings.SplitAfter(image.ID, ":")[1][0:12])
@@ -42,7 +43,7 @@ func getImageInformation(cli *client.Client) ([]string, []string) {
 func init() {
 	commandNames := extractNames(commands())
 	utilNames := []string{"-h", "--help", "-v", "--version"}
-	if len(os.Args) > 1 && util.Exists(commandNames, os.Args[1]) && !util.Exists(utilNames, os.Args[1]) {
+	if len(os.Args) > 1 && exists(commandNames, os.Args[1]) && !exists(utilNames, os.Args[1]) {
 		docker, _ = client.NewEnvClient()
 		psIds, psNames = getContainerInformation(docker, false)
 		psaIds, psaNames = getContainerInformation(docker, true)

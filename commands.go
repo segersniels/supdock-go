@@ -2,11 +2,15 @@ package main
 
 import (
 	"bytes"
+	"context"
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
 
-	util "github.com/segersniels/goutil"
+	log "github.com/sirupsen/logrus"
+
+	"github.com/docker/docker/api/types"
 	"github.com/urfave/cli"
 )
 
@@ -17,19 +21,45 @@ func passThroughDocker() {
 	cmd.Stdin = os.Stdin
 	err := cmd.Run()
 	if err != nil {
-		util.Error(err)
+		log.Fatal(err)
 	}
 }
 
 func customDocker(args []string) {
 	var errbuf bytes.Buffer
-	cmd := exec.Command("docker", args...)
-	cmd.Stderr = &errbuf
-	cmd.Stdout = os.Stdout
-	cmd.Stdin = os.Stdin
-	err := cmd.Run()
-	if err != nil {
-		util.Error(strings.TrimSpace(errbuf.String()))
+	if exists(args, "|") {
+		index := getIndex(args, "|")
+		length := len(args)
+		cmd := exec.Command("docker", args[0:index]...)
+		pipeCmd := exec.Command(args[index+1], args[index+2:length]...)
+
+		pipeCmd.Stdin, _ = cmd.StdoutPipe()
+		pipeCmd.Stdout = os.Stdout
+		pipeCmd.Stderr = &errbuf
+
+		err := pipeCmd.Start()
+		if err != nil {
+			log.Fatal(strings.TrimSpace(errbuf.String()))
+		}
+
+		err = cmd.Run()
+		if err != nil {
+			log.Fatal(strings.TrimSpace(errbuf.String()))
+		}
+
+		err = pipeCmd.Wait()
+		if err != nil {
+			log.Fatal(strings.TrimSpace(errbuf.String()))
+		}
+	} else {
+		cmd := exec.Command("docker", args...)
+		cmd.Stderr = &errbuf
+		cmd.Stdout = os.Stdout
+		cmd.Stdin = os.Stdin
+		err := cmd.Run()
+		if err != nil {
+			log.Fatal(strings.TrimSpace(errbuf.String()))
+		}
 	}
 }
 
@@ -47,7 +77,7 @@ func extractNames(commands []cli.Command) []string {
 func constructChoices(ids []string, names []string) []string {
 	choices := []string{}
 	for index, id := range ids {
-		choice := id + " - " + names[index]
+		choice := id + " - " + strings.TrimLeft(names[index], "/")
 		if choice != " - " {
 			choices = append(choices, choice)
 		}
@@ -55,14 +85,19 @@ func constructChoices(ids []string, names []string) []string {
 	return choices
 }
 
+func selectID(ids []string, names []string, question string) string {
+	options := constructChoices(ids, names)
+	answer := promptQuestion(question, options)
+	id := strings.Split(answer, " - ")[0]
+	return id
+}
+
 func execute(command string, ids []string, names []string, question string) {
 	if len(ids) >= 1 && len(names) >= 1 {
-		options := constructChoices(ids, names)
-		answer := util.Question(question, options)
-		id := strings.Split(answer, " - ")[0]
+		id := selectID(ids, names, question)
 		switch command {
 		case "ssh":
-			shell := util.Question("Which shell is the container using?", []string{"bash", "ash"})
+			shell := promptQuestion("Which shell is the container using?", []string{"bash", "ash"})
 			customDocker([]string{"exec", "-ti", id, shell})
 		case "env":
 			customDocker([]string{"exec", "-ti", id, "env"})
@@ -72,8 +107,46 @@ func execute(command string, ids []string, names []string, question string) {
 			customDocker([]string{command, id})
 		}
 	} else {
-		util.Warn("No options found to construct prompt")
+		log.Fatal("No options found to construct prompt")
 	}
+}
+
+func start(id string) {
+	err := docker.ContainerStart(context.Background(), id, types.ContainerStartOptions{})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(id)
+}
+
+func stop(id string) {
+	err := docker.ContainerStop(context.Background(), id, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(id)
+}
+
+func restart(id string) {
+	err := docker.ContainerRestart(context.Background(), id, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(id)
+}
+
+func remove(removeType string, id string) {
+	var err error
+	switch removeType {
+	case "container":
+		err = docker.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions{})
+	case "image":
+		_, err = docker.ImageRemove(context.Background(), id, types.ImageRemoveOptions{})
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(id)
 }
 
 func commands() []cli.Command {
@@ -147,7 +220,8 @@ func commands() []cli.Command {
 			},
 			Action: func(c *cli.Context) error {
 				if len(c.Args()) == 0 && c.NumFlags() == 0 {
-					execute("start", psaIds, psaNames, "Which container would you like to start?")
+					id := selectID(psaIds, psaNames, "Which container would you like to start?")
+					start(id)
 				} else {
 					passThroughDocker()
 				}
@@ -165,7 +239,8 @@ func commands() []cli.Command {
 			},
 			Action: func(c *cli.Context) error {
 				if len(c.Args()) == 0 && c.NumFlags() == 0 {
-					execute("restart", psIds, psNames, "Which container would you like to restart?")
+					id := selectID(psIds, psNames, "Which container would you like to restart?")
+					restart(id)
 				} else {
 					passThroughDocker()
 				}
@@ -183,11 +258,30 @@ func commands() []cli.Command {
 			},
 			Action: func(c *cli.Context) error {
 				if len(c.Args()) == 0 && c.NumFlags() == 0 {
-					execute("stop", psIds, psNames, "Which container would you like to stop?")
+					if psIds == nil {
+						log.Fatal("No containers found to start")
+					}
+					id := selectID(psIds, psNames, "Which container would you like to stop?")
+					stop(id)
 				} else {
 					passThroughDocker()
 				}
 				return nil
+			},
+			Subcommands: []cli.Command{
+				{
+					Name:  "all",
+					Usage: "Stop all running containers",
+					Action: func(c *cli.Context) error {
+						if psIds == nil {
+							log.Fatal("No containers found to start")
+						}
+						for _, id := range psIds {
+							stop(id)
+						}
+						return nil
+					},
+				},
 			},
 		},
 		{
@@ -225,7 +319,8 @@ func commands() []cli.Command {
 			},
 			Action: func(c *cli.Context) error {
 				if len(c.Args()) == 0 && c.NumFlags() == 0 {
-					execute("rm", psaIds, psaNames, "Which container would you like to remove?")
+					id := selectID(psaIds, psaNames, "Which container would you like to remove?")
+					remove("container", id)
 				} else {
 					passThroughDocker()
 				}
@@ -247,7 +342,8 @@ func commands() []cli.Command {
 			},
 			Action: func(c *cli.Context) error {
 				if len(c.Args()) == 0 && c.NumFlags() == 0 {
-					execute("rmi", imageIds, imageNames, "Which image would you like to remove?")
+					id := selectID(imageIds, imageNames, "Which image would you like to remove?")
+					remove("image", id)
 				} else {
 					passThroughDocker()
 				}
@@ -348,22 +444,7 @@ func commands() []cli.Command {
 			Name:  "prune",
 			Usage: "Remove stopped containers and dangling images",
 			Action: func(c *cli.Context) error {
-				err := util.Execute("docker system prune -f", []string{})
-				if err != nil {
-					util.Error(err)
-				}
-				return nil
-			},
-		},
-		{
-			Name:    "destroy",
-			Usage:   "Stop all running containers",
-			Aliases: []string{"shutdown"},
-			Action: func(c *cli.Context) error {
-				err := util.Execute("docker stop $(docker ps -q)", []string{})
-				if err != nil {
-					util.Error(err)
-				}
+				customDocker([]string{"system", "prune", "-f"})
 				return nil
 			},
 		},
@@ -371,19 +452,7 @@ func commands() []cli.Command {
 			Name:  "memory",
 			Usage: "See the memory usage of all running containers",
 			Action: func(c *cli.Context) error {
-				err := util.Execute("docker ps -q | xargs  docker stats --no-stream", []string{})
-				if err != nil {
-					util.Error(err)
-				}
-				return nil
-			},
-		},
-		{
-			Name:    "latest",
-			Usage:   "Update to the latest version of supdock",
-			Aliases: []string{"upgrade"},
-			Action: func(c *cli.Context) error {
-				update()
+				customDocker([]string{"ps", "-q", "|", "xargs", "docker", "stats", "--no-stream"})
 				return nil
 			},
 		},
