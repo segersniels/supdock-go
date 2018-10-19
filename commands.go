@@ -8,9 +8,8 @@ import (
 	"os/exec"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
-
 	"github.com/docker/docker/api/types"
+	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
 
@@ -103,6 +102,8 @@ func execute(command string, ids []string, names []string, question string) {
 			customDocker([]string{"exec", "-ti", id, "env"})
 		case "logs -f":
 			customDocker([]string{"logs", "-f", id})
+		case "stats --no-stream":
+			customDocker([]string{"stats", "--no-stream", id})
 		default:
 			customDocker([]string{command, id})
 		}
@@ -406,8 +407,14 @@ func commands() []cli.Command {
 				},
 			},
 			Action: func(c *cli.Context) error {
-				if len(c.Args()) == 0 && c.Bool("s") {
-					execute("stats", psIds, psNames, "Which container would you like to see that stats of?")
+				if len(c.Args()) == 0 {
+					if c.Bool("s") {
+						if c.Bool("no-stream") {
+							execute("stats --no-stream", psIds, psNames, "Which container would you like to see the stats of?")
+						} else {
+							execute("stats", psIds, psNames, "Which container would you like to see the stats of?")
+						}
+					}
 				} else {
 					passThroughDocker()
 				}
@@ -445,14 +452,6 @@ func commands() []cli.Command {
 			Usage: "Remove stopped containers and dangling images",
 			Action: func(c *cli.Context) error {
 				customDocker([]string{"system", "prune", "-f"})
-				return nil
-			},
-		},
-		{
-			Name:  "memory",
-			Usage: "See the memory usage of all running containers",
-			Action: func(c *cli.Context) error {
-				customDocker([]string{"ps", "-q", "|", "xargs", "docker", "stats", "--no-stream"})
 				return nil
 			},
 		},
