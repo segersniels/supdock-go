@@ -100,9 +100,9 @@ func execute(command string, ids []string, names []string, question string) {
 			customDocker([]string{"exec", "-ti", id, shell})
 		case "env":
 			customDocker([]string{"exec", "-ti", id, "env"})
-		case "logs -f":
+		case "logs-force":
 			customDocker([]string{"logs", "-f", id})
-		case "stats --no-stream":
+		case "stats-no-stream":
 			customDocker([]string{"stats", "--no-stream", id})
 		default:
 			customDocker([]string{command, id})
@@ -143,6 +143,8 @@ func remove(removeType string, id string) {
 		err = docker.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions{})
 	case "image":
 		_, err = docker.ImageRemove(context.Background(), id, types.ImageRemoveOptions{})
+	case "image-force":
+		_, err = docker.ImageRemove(context.Background(), id, types.ImageRemoveOptions{Force: true})
 	}
 	if err != nil {
 		log.Fatal(err)
@@ -184,7 +186,7 @@ func commands() []cli.Command {
 			Action: func(c *cli.Context) error {
 				if len(c.Args()) == 0 {
 					if c.NumFlags() == 2 && c.Bool("f") {
-						execute("logs -f", psaIds, psaNames, "Which container would you like to see the logs of?")
+						execute("logs-force", psaIds, psaNames, "Which container would you like to see the logs of?")
 					} else {
 						execute("logs", psaIds, psaNames, "Which container would you like to see the logs of?")
 					}
@@ -342,9 +344,13 @@ func commands() []cli.Command {
 				},
 			},
 			Action: func(c *cli.Context) error {
-				if len(c.Args()) == 0 && c.NumFlags() == 0 {
+				if len(c.Args()) == 0 {
 					id := selectID(imageIds, imageNames, "Which image would you like to remove?")
-					remove("image", id)
+					if c.NumFlags() == 0 {
+						remove("image", id)
+					} else if c.Bool("f") {
+						remove("image-force", id)
+					}
 				} else {
 					passThroughDocker()
 				}
@@ -409,7 +415,7 @@ func commands() []cli.Command {
 			Action: func(c *cli.Context) error {
 				if c.Bool("s") {
 					if c.Bool("no-stream") {
-						execute("stats --no-stream", psIds, psNames, "Which container would you like to see the stats of?")
+						execute("stats-no-stream", psIds, psNames, "Which container would you like to see the stats of?")
 					} else {
 						execute("stats", psIds, psNames, "Which container would you like to see the stats of?")
 					}
@@ -447,9 +453,25 @@ func commands() []cli.Command {
 		},
 		{
 			Name:  "prune",
-			Usage: "Remove stopped containers and dangling images",
+			Usage: "Remove stopped containers and dangling images. For more detailed usage refer to 'docker system prune -h'",
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "a, all",
+					Usage: "Remove all unused images not just dangling ones",
+				},
+				cli.BoolFlag{
+					Name:  "f, force",
+					Usage: "Do not prompt for confirmation",
+				},
+			},
 			Action: func(c *cli.Context) error {
-				customDocker([]string{"system", "prune", "-f"})
+				var flags []string
+				for _, flag := range c.FlagNames() {
+					if c.IsSet(flag) {
+						flags = append(flags, "-"+flag)
+					}
+				}
+				customDocker(append([]string{"system", "prune"}, flags...))
 				return nil
 			},
 		},

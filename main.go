@@ -11,7 +11,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "supdock"
 	app.Usage = "What's Up Dock(er)?"
-	app.Version = "0.1.7-rc.2"
+	app.Version = "0.1.8"
 	app.Commands = commands()
 
 	commandNames := extractNames(app.Commands)
