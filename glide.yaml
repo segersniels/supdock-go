@@ -9,9 +9,11 @@ import:
   - client
 - package: github.com/urfave/cli
   version: ^1.20.0
-- package: github.com/sirupsen/logrus
-  version: master
 - package: github.com/Sirupsen/logrus
+  version: master
   repo: git@github.com:/sirupsen/logrus
   vcs: git
-  version: master
+- package: gopkg.in/yaml.v2
+  version: ^2.2.1
+- package: github.com/thoas/go-funk
+  version: ^0.4.0

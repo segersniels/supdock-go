@@ -23,9 +23,9 @@ func init() {
 var ErrorKey = "error"
 
 // An entry is the final or intermediate Logrus logging entry. It contains all
-// the fields passed with WithField{,s}. It's finally logged when Debug, Info,
-// Warn, Error, Fatal or Panic is called on it. These objects can be reused and
-// passed around as much as you wish to avoid field duplication.
+// the fields passed with WithField{,s}. It's finally logged when Trace, Debug,
+// Info, Warn, Error, Fatal or Panic is called on it. These objects can be
+// reused and passed around as much as you wish to avoid field duplication.
 type Entry struct {
 	Logger *Logger
 
@@ -35,11 +35,11 @@ type Entry struct {
 	// Time at which the log entry was created
 	Time time.Time
 
-	// Level the log entry was logged at: Debug, Info, Warn, Error, Fatal or Panic
+	// Level the log entry was logged at: Trace, Debug, Info, Warn, Error, Fatal or Panic
 	// This field will be set on entry firing and the value will be equal to the one in Logger struct field.
 	Level Level
 
-	// Message passed to Debug, Info, Warn, Error, Fatal or Panic
+	// Message passed to Trace, Debug, Info, Warn, Error, Fatal or Panic
 	Message string
 
 	// When formatter is called in entry.log(), a Buffer may be set to entry
@@ -162,6 +162,12 @@ func (entry *Entry) write() {
 	}
 }
 
+func (entry *Entry) Trace(args ...interface{}) {
+	if entry.Logger.IsLevelEnabled(TraceLevel) {
+		entry.log(TraceLevel, fmt.Sprint(args...))
+	}
+}
+
 func (entry *Entry) Debug(args ...interface{}) {
 	if entry.Logger.IsLevelEnabled(DebugLevel) {
 		entry.log(DebugLevel, fmt.Sprint(args...))
@@ -198,7 +204,7 @@ func (entry *Entry) Fatal(args ...interface{}) {
 	if entry.Logger.IsLevelEnabled(FatalLevel) {
 		entry.log(FatalLevel, fmt.Sprint(args...))
 	}
-	Exit(1)
+	entry.Logger.Exit(1)
 }
 
 func (entry *Entry) Panic(args ...interface{}) {
@@ -209,6 +215,12 @@ func (entry *Entry) Panic(args ...interface{}) {
 }
 
 // Entry Printf family functions
+
+func (entry *Entry) Tracef(format string, args ...interface{}) {
+	if entry.Logger.IsLevelEnabled(TraceLevel) {
+		entry.Trace(fmt.Sprintf(format, args...))
+	}
+}
 
 func (entry *Entry) Debugf(format string, args ...interface{}) {
 	if entry.Logger.IsLevelEnabled(DebugLevel) {
@@ -246,7 +258,7 @@ func (entry *Entry) Fatalf(format string, args ...interface{}) {
 	if entry.Logger.IsLevelEnabled(FatalLevel) {
 		entry.Fatal(fmt.Sprintf(format, args...))
 	}
-	Exit(1)
+	entry.Logger.Exit(1)
 }
 
 func (entry *Entry) Panicf(format string, args ...interface{}) {
@@ -256,6 +268,12 @@ func (entry *Entry) Panicf(format string, args ...interface{}) {
 }
 
 // Entry Println family functions
+
+func (entry *Entry) Traceln(args ...interface{}) {
+	if entry.Logger.IsLevelEnabled(TraceLevel) {
+		entry.Trace(entry.sprintlnn(args...))
+	}
+}
 
 func (entry *Entry) Debugln(args ...interface{}) {
 	if entry.Logger.IsLevelEnabled(DebugLevel) {
@@ -293,7 +311,7 @@ func (entry *Entry) Fatalln(args ...interface{}) {
 	if entry.Logger.IsLevelEnabled(FatalLevel) {
 		entry.Fatal(entry.sprintlnn(args...))
 	}
-	Exit(1)
+	entry.Logger.Exit(1)
 }
 
 func (entry *Entry) Panicln(args ...interface{}) {

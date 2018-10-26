@@ -1,66 +1,12 @@
 package main
 
 import (
-	"bytes"
-	"context"
 	"fmt"
-	"os"
-	"os/exec"
-	"strings"
 
-	"github.com/docker/docker/api/types"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
+	yaml "gopkg.in/yaml.v2"
 )
-
-func passThroughDocker() {
-	cmd := exec.Command("docker", os.Args[1:]...)
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
-	cmd.Stdin = os.Stdin
-	err := cmd.Run()
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func customDocker(args []string) {
-	var errbuf bytes.Buffer
-	if exists(args, "|") {
-		index := getIndex(args, "|")
-		length := len(args)
-		cmd := exec.Command("docker", args[0:index]...)
-		pipeCmd := exec.Command(args[index+1], args[index+2:length]...)
-
-		pipeCmd.Stdin, _ = cmd.StdoutPipe()
-		pipeCmd.Stdout = os.Stdout
-		pipeCmd.Stderr = &errbuf
-
-		err := pipeCmd.Start()
-		if err != nil {
-			log.Fatal(strings.TrimSpace(errbuf.String()))
-		}
-
-		err = cmd.Run()
-		if err != nil {
-			log.Fatal(strings.TrimSpace(errbuf.String()))
-		}
-
-		err = pipeCmd.Wait()
-		if err != nil {
-			log.Fatal(strings.TrimSpace(errbuf.String()))
-		}
-	} else {
-		cmd := exec.Command("docker", args...)
-		cmd.Stderr = &errbuf
-		cmd.Stdout = os.Stdout
-		cmd.Stdin = os.Stdin
-		err := cmd.Run()
-		if err != nil {
-			log.Fatal(strings.TrimSpace(errbuf.String()))
-		}
-	}
-}
 
 func extractNames(commands []cli.Command) []string {
 	var names []string
@@ -71,85 +17,6 @@ func extractNames(commands []cli.Command) []string {
 		}
 	}
 	return names
-}
-
-func constructChoices(ids []string, names []string) []string {
-	choices := []string{}
-	for index, id := range ids {
-		choice := id + " - " + strings.TrimLeft(names[index], "/")
-		if choice != " - " {
-			choices = append(choices, choice)
-		}
-	}
-	return choices
-}
-
-func selectID(ids []string, names []string, question string) string {
-	options := constructChoices(ids, names)
-	answer := promptQuestion(question, options)
-	id := strings.Split(answer, " - ")[0]
-	return id
-}
-
-func execute(command string, ids []string, names []string, question string) {
-	if len(ids) >= 1 && len(names) >= 1 {
-		id := selectID(ids, names, question)
-		switch command {
-		case "ssh":
-			shell := promptQuestion("Which shell is the container using?", []string{"bash", "ash"})
-			customDocker([]string{"exec", "-ti", id, shell})
-		case "env":
-			customDocker([]string{"exec", "-ti", id, "env"})
-		case "logs-force":
-			customDocker([]string{"logs", "-f", id})
-		case "stats-no-stream":
-			customDocker([]string{"stats", "--no-stream", id})
-		default:
-			customDocker([]string{command, id})
-		}
-	} else {
-		log.Fatal("No options found to construct prompt")
-	}
-}
-
-func start(id string) {
-	err := docker.ContainerStart(context.Background(), id, types.ContainerStartOptions{})
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(id)
-}
-
-func stop(id string) {
-	err := docker.ContainerStop(context.Background(), id, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(id)
-}
-
-func restart(id string) {
-	err := docker.ContainerRestart(context.Background(), id, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(id)
-}
-
-func remove(removeType string, id string) {
-	var err error
-	switch removeType {
-	case "container":
-		err = docker.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions{})
-	case "image":
-		_, err = docker.ImageRemove(context.Background(), id, types.ImageRemoveOptions{})
-	case "image-force":
-		_, err = docker.ImageRemove(context.Background(), id, types.ImageRemoveOptions{Force: true})
-	}
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(id)
 }
 
 func commands() []cli.Command {
@@ -186,9 +53,9 @@ func commands() []cli.Command {
 			Action: func(c *cli.Context) error {
 				if len(c.Args()) == 0 {
 					if c.NumFlags() == 2 && c.Bool("f") {
-						execute("logs-force", psaIds, psaNames, "Which container would you like to see the logs of?")
+						executeDocker("logs-force", psaIds, psaNames, "Which container would you like to see the logs of?")
 					} else {
-						execute("logs", psaIds, psaNames, "Which container would you like to see the logs of?")
+						executeDocker("logs", psaIds, psaNames, "Which container would you like to see the logs of?")
 					}
 				} else {
 					passThroughDocker()
@@ -291,7 +158,7 @@ func commands() []cli.Command {
 			Name:  "ssh",
 			Usage: "SSH into a container",
 			Action: func(c *cli.Context) error {
-				execute("ssh", psIds, psNames, "Which container would you like to connect with?")
+				executeDocker("ssh", psIds, psNames, "Which container would you like to connect with?")
 				return nil
 			},
 		},
@@ -299,7 +166,7 @@ func commands() []cli.Command {
 			Name:  "env",
 			Usage: "See the environment variables of a running container",
 			Action: func(c *cli.Context) error {
-				execute("env", psIds, psNames, "Which container would you like to see the environment variables of?")
+				executeDocker("env", psIds, psNames, "Which container would you like to see the environment variables of?")
 				return nil
 			},
 		},
@@ -380,7 +247,7 @@ func commands() []cli.Command {
 			},
 			Action: func(c *cli.Context) error {
 				if len(c.Args()) == 0 && c.NumFlags() == 0 {
-					execute("history", imageIds, imageNames, "Which image would you like to see the history of?")
+					executeDocker("history", imageIds, imageNames, "Which image would you like to see the history of?")
 				} else {
 					passThroughDocker()
 				}
@@ -415,9 +282,9 @@ func commands() []cli.Command {
 			Action: func(c *cli.Context) error {
 				if c.Bool("s") {
 					if c.Bool("no-stream") {
-						execute("stats-no-stream", psIds, psNames, "Which container would you like to see the stats of?")
+						executeDocker("stats-no-stream", psIds, psNames, "Which container would you like to see the stats of?")
 					} else {
-						execute("stats", psIds, psNames, "Which container would you like to see the stats of?")
+						executeDocker("stats", psIds, psNames, "Which container would you like to see the stats of?")
 					}
 				} else {
 					passThroughDocker()
@@ -444,7 +311,7 @@ func commands() []cli.Command {
 			},
 			Action: func(c *cli.Context) error {
 				if len(c.Args()) == 0 && c.NumFlags() == 0 {
-					execute("inspect", psIds, psNames, "Which container would you like to inspect?")
+					executeDocker("inspect", psIds, psNames, "Which container would you like to inspect?")
 				} else {
 					passThroughDocker()
 				}
@@ -473,6 +340,160 @@ func commands() []cli.Command {
 				}
 				customDocker(append([]string{"system", "prune"}, flags...))
 				return nil
+			},
+		},
+		{
+			Name:  "compose",
+			Usage: "Allows for dynamic docker-compose usage",
+			Subcommands: []cli.Command{
+				{
+					Name:  "build",
+					Usage: "Build or rebuild services",
+					Action: func(c *cli.Context) error {
+						if len(c.Args()) == 0 && c.NumFlags() == 0 {
+							executeCompose("build", "Which project would you like to build?")
+						} else {
+							passThroughCompose()
+						}
+						return nil
+					},
+				},
+				{
+					Name:  "restart",
+					Usage: "Restart services",
+					Action: func(c *cli.Context) error {
+						if len(c.Args()) == 0 && c.NumFlags() == 0 {
+							executeCompose("restart", "Which project would you like to restart?")
+						} else {
+							passThroughCompose()
+						}
+						return nil
+					},
+				},
+				{
+					Name:  "pull",
+					Usage: "Pull service images",
+					Action: func(c *cli.Context) error {
+						if len(c.Args()) == 0 && c.NumFlags() == 0 {
+							executeCompose("pull", "Which project would you like to pull the images from?")
+						} else {
+							passThroughCompose()
+						}
+						return nil
+					},
+				},
+				{
+					Name:  "start",
+					Usage: "Start services",
+					Action: func(c *cli.Context) error {
+						if len(c.Args()) == 0 && c.NumFlags() == 0 {
+							executeCompose("start", "Which project would you like to start?")
+						} else {
+							passThroughCompose()
+						}
+						return nil
+					},
+				},
+				{
+					Name:  "up",
+					Usage: "Create and start containers",
+					Flags: []cli.Flag{
+						cli.BoolFlag{
+							Name:  "d, detached",
+							Usage: "Detached mode: Run containers in the background",
+						},
+					},
+					Action: func(c *cli.Context) error {
+						if len(c.Args()) == 0 {
+							if c.Bool("d") {
+								executeCompose("up-detached", "Which project would you like to start?")
+							} else {
+								executeCompose("up", "Which project would you like to start?")
+							}
+						} else {
+							passThroughCompose()
+						}
+						return nil
+					},
+				},
+				{
+					Name:  "down",
+					Usage: "Stop and remove containers, networks, images, and volumes",
+					Action: func(c *cli.Context) error {
+						if len(c.Args()) == 0 && c.NumFlags() == 0 {
+							executeCompose("down", "Which project would you like to bring down?")
+						} else {
+							passThroughCompose()
+						}
+						return nil
+					},
+				},
+				{
+					Name:  "stop",
+					Usage: "Stop services",
+					Action: func(c *cli.Context) error {
+						if len(c.Args()) == 0 && c.NumFlags() == 0 {
+							executeCompose("stop", "Which project would you like to stop?")
+						} else {
+							passThroughCompose()
+						}
+						return nil
+					},
+				},
+				{
+					Name:  "top",
+					Usage: "Display the running processes",
+					Action: func(c *cli.Context) error {
+						if len(c.Args()) == 0 && c.NumFlags() == 0 {
+							executeCompose("top", "Which project would you like to see the running processes of?")
+						} else {
+							passThroughCompose()
+						}
+						return nil
+					},
+				},
+				{
+					Name:  "logs",
+					Usage: "View output from containers",
+					Action: func(c *cli.Context) error {
+						if len(c.Args()) == 0 && c.NumFlags() == 0 {
+							executeCompose("logs", "Which project would you like to see the logs of?")
+						} else {
+							passThroughCompose()
+						}
+						return nil
+					},
+				},
+				{
+					Name:  "ps",
+					Usage: "List containers",
+					Action: func(c *cli.Context) error {
+						if len(c.Args()) == 0 && c.NumFlags() == 0 {
+							executeCompose("ps", "Which project would you like to see the running processes of?")
+						} else {
+							passThroughCompose()
+						}
+						return nil
+					},
+				},
+				{
+					Name:    "list",
+					Aliases: []string{"ls"},
+					Flags: []cli.Flag{
+						cli.IntFlag{
+							Name:  "d, depth",
+							Usage: "Define the depth of the docker-compose file search",
+							Value: 6,
+						},
+					},
+					Usage: "List all your docker-compose projects",
+					Action: func(c *cli.Context) error {
+						files := searchComposeFiles(c.Int("d"))
+						projects, _ := yaml.Marshal(files)
+						fmt.Println(string(projects))
+						return nil
+					},
+				},
 			},
 		},
 	}

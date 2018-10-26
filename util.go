@@ -2,11 +2,29 @@ package main
 
 import (
 	"reflect"
-
-	log "github.com/sirupsen/logrus"
+	"strings"
 
 	"github.com/AlecAivazis/survey"
+	log "github.com/sirupsen/logrus"
 )
+
+func constructChoices(ids []string, names []string) []string {
+	choices := []string{}
+	for index, id := range ids {
+		choice := id + " - " + strings.TrimLeft(names[index], "/")
+		if choice != " - " {
+			choices = append(choices, choice)
+		}
+	}
+	return choices
+}
+
+func selectID(ids []string, names []string, question string) string {
+	options := constructChoices(ids, names)
+	answer := promptQuestion(question, options)
+	id := strings.Split(answer, " - ")[0]
+	return id
+}
 
 func getIndex(slice interface{}, item interface{}) int {
 	s := reflect.ValueOf(slice)
