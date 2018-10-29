@@ -10,5 +10,5 @@ else
     git config --global user.name "segersniels"
     git tag -a "$version" -m "$message"
     git push origin "$version"
-    goreleaser
+    goreleaser release --skip-validate
 fi
