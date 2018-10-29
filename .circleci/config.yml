@@ -10,14 +10,16 @@ jobs:
     steps:
       - checkout
       - run:
-          name: "Build testing binary"
+          name: "Install glide and generate vendor"
           command: |
-            GOOS=linux go build -o bin/supdock
+            curl https://glide.sh/get | sh
+            glide install
+      - run:
+          name: "Build testing binary"
+          command: GOOS=linux go build -o bin/supdock
       - run:
           name: "Test if binary is executable"
-          command: |
-            ./bin/supdock -h
+          command: ./bin/supdock -h
       - run:
           name: "Release binary"
-          command: |
-            ./gorelease.sh
+          command: ./gorelease.sh
