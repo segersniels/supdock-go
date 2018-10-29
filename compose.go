@@ -28,20 +28,36 @@ func customCompose(args []string, path string) {
 	}
 }
 
+func checkIfLocalDockerComposeFile() (bool, string) {
+	if _, err := os.Stat("./docker-compose.yaml"); !os.IsNotExist(err) {
+		return true, "docker-compose.yaml"
+	} else if _, err := os.Stat("./docker-compose.yml"); !os.IsNotExist(err) {
+		return true, "docker-compose.yml"
+	}
+	return false, ""
+}
+
 func executeCompose(command string, question string) {
-	files := searchComposeFiles(6)
-	names := funk.Map(files, func(c Compose) string {
-		return c.Name
-	})
-	name := promptQuestion(question, names.([]string))
-	project := funk.Find(files, func(c Compose) bool {
-		return c.Name == name
-	})
+	var path string
+	isLocal, file := checkIfLocalDockerComposeFile()
+	if !isLocal {
+		files := searchComposeFiles()
+		names := funk.Map(files, func(c Compose) string {
+			return c.Name
+		})
+		name := promptQuestion(question, names.([]string))
+		project := funk.Find(files, func(c Compose) bool {
+			return c.Name == name
+		})
+		path = project.(Compose).Path
+	} else {
+		path = file
+	}
 	switch command {
 	case "up-detached":
-		customCompose([]string{"up", "-d"}, project.(Compose).Path)
+		customCompose([]string{"up", "-d"}, path)
 	default:
-		customCompose([]string{command}, project.(Compose).Path)
+		customCompose([]string{command}, path)
 	}
 }
 
@@ -89,7 +105,7 @@ func search(wg *sync.WaitGroup, root string, depth int, results chan Compose) {
 	}
 }
 
-func searchComposeFiles(depth int) []Compose {
+func searchComposeFiles() []Compose {
 	var wg sync.WaitGroup
 	var files []Compose
 	results := make(chan Compose)

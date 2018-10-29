@@ -5,14 +5,14 @@ import (
 	"os"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
-
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
+	log "github.com/sirupsen/logrus"
 )
 
 var psIds, psaIds, imageIds, psNames, psaNames, imageNames []string
 var docker *client.Client
+var depth int
 
 func getContainerInformation(cli *client.Client, all bool) ([]string, []string) {
 	var ids, names []string

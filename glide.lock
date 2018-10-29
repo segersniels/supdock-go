@@ -1,5 +1,5 @@
 hash: e2f0f18274ac04b1c86f12f45cb190ee0454da4aa97fc615ddb5eb0a7e484fa4
-updated: 2018-10-25T14:42:28.487855+02:00
+updated: 2018-10-29T09:18:34.435672+01:00
 imports:
 - name: github.com/AlecAivazis/survey
   version: 0be4439d90f533f1ea2e0adddd5b1a405e6f5559
@@ -58,9 +58,9 @@ imports:
 - name: github.com/pkg/errors
   version: 059132a15dd08d6704c67711dae0cf35ab991756
 - name: github.com/sirupsen/logrus
-  version: 4fabf2fffcecfd47f802869b7b92d75e43c5a095
+  version: 566a5f690849162ff53cf98f3c42135389d63f95
 - name: github.com/Sirupsen/logrus
-  version: 4fabf2fffcecfd47f802869b7b92d75e43c5a095
+  version: 566a5f690849162ff53cf98f3c42135389d63f95
   repo: git@github.com:/sirupsen/logrus
   vcs: git
 - name: github.com/thoas/go-funk
@@ -68,18 +68,18 @@ imports:
 - name: github.com/urfave/cli
   version: cfb38830724cc34fedffe9a2a29fb54fa9169cd1
 - name: golang.org/x/crypto
-  version: 85e1b3f9139abd58575d728a509643924e3b2ebf
+  version: 45a5f77698d342a8c2ef8423abdf0ba6880b008a
   subpackages:
   - ssh/terminal
 - name: golang.org/x/net
-  version: 9b4f9f5ad5197c79fd623a3638e70d8b26cef344
+  version: c44066c5c816ec500d459a2a324a753f78531ae0
   subpackages:
   - context
   - context/ctxhttp
   - internal/socks
   - proxy
 - name: golang.org/x/sys
-  version: d989b31c87461dc8ab2f1cac6792814e27fadea9
+  version: 95b1ffbd15a57cc5abb3f04402b9e8ec0016a52c
   subpackages:
   - unix
   - windows
