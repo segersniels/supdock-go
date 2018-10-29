@@ -1,5 +1,5 @@
-hash: e2f0f18274ac04b1c86f12f45cb190ee0454da4aa97fc615ddb5eb0a7e484fa4
-updated: 2018-10-29T09:18:34.435672+01:00
+hash: 6894b37071e79f3e0bd69299e4fd2175b4a04ffd45aa4d08f35bd2d403f6bb3f
+updated: 2018-10-29T09:43:28.31122+01:00
 imports:
 - name: github.com/AlecAivazis/survey
   version: 0be4439d90f533f1ea2e0adddd5b1a405e6f5559
@@ -57,12 +57,12 @@ imports:
   version: c9281466c8b2f606084ac71339773efd177436e7
 - name: github.com/pkg/errors
   version: 059132a15dd08d6704c67711dae0cf35ab991756
-- name: github.com/sirupsen/logrus
-  version: 566a5f690849162ff53cf98f3c42135389d63f95
 - name: github.com/Sirupsen/logrus
   version: 566a5f690849162ff53cf98f3c42135389d63f95
   repo: git@github.com:/sirupsen/logrus
   vcs: git
+- name: github.com/sirupsen/logrus
+  version: ad15b42461921f1fb3529b058c6786c6a45d5162
 - name: github.com/thoas/go-funk
   version: 9132db0aefe2a09565f5124e267ac9a89845d8f6
 - name: github.com/urfave/cli
