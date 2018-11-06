@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"os/user"
@@ -78,31 +79,37 @@ func strip(path string) string {
 	return secondParent + "/" + filepath.Base(firstParent)
 }
 
-func search(wg *sync.WaitGroup, root string, depth int, results chan Compose) {
+func search(wg *sync.WaitGroup, folder string, depth int, results chan Compose) {
 	defer wg.Done()
 
-	visit := func(path string, info os.FileInfo, err error) error {
-		// When subdirectory is found and it isn't the root directory start a new parallel walk
-		if info.IsDir() && path != root {
-			if len(strings.Split(path, "/")) < depth {
-				wg.Add(1)
-				go search(wg, path, depth, results)
+	files, _ := ioutil.ReadDir(folder)
+	var directories []string
+
+	for _, file := range files {
+		path := folder + "/" + file.Name()
+
+		if file.IsDir() {
+			if !strings.Contains(path, "Library") {
+				directories = append(directories, path)
 			}
-			return filepath.SkipDir
-		}
-		if strings.Contains(path, "docker-compose.yaml") || strings.Contains(path, "docker-compose.yml") {
+			continue
+		} else if file.Name() == "docker-compose.yml" || file.Name() == "docker-compose.yaml" {
 			results <- Compose{
 				Name: strip(path),
 				Path: path,
 			}
+			return
 		}
-		return nil
 	}
 
-	err := filepath.Walk(root, visit)
-	if err != nil {
-		log.Fatal(err)
+	if depth > 1 {
+		for _, folder := range directories {
+			wg.Add(1)
+			go search(wg, folder, depth-1, results)
+		}
 	}
+
+	return
 }
 
 func searchComposeFiles() []Compose {
@@ -123,6 +130,7 @@ func searchComposeFiles() []Compose {
 		}
 	}()
 	wg.Wait()
+	close(results)
 
 	return files
 }

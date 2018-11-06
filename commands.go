@@ -373,7 +373,7 @@ func commands() []cli.Command {
 						cli.IntFlag{
 							Name:        "depth",
 							Usage:       "Define the depth of the docker-compose file search",
-							Value:       6,
+							Value:       4,
 							Destination: &depth,
 						},
 					},
@@ -393,7 +393,7 @@ func commands() []cli.Command {
 						cli.IntFlag{
 							Name:        "depth",
 							Usage:       "Define the depth of the docker-compose file search",
-							Value:       6,
+							Value:       4,
 							Destination: &depth,
 						},
 					},
@@ -413,7 +413,7 @@ func commands() []cli.Command {
 						cli.IntFlag{
 							Name:        "depth",
 							Usage:       "Define the depth of the docker-compose file search",
-							Value:       6,
+							Value:       4,
 							Destination: &depth,
 						},
 					},
@@ -437,7 +437,7 @@ func commands() []cli.Command {
 						cli.IntFlag{
 							Name:        "depth",
 							Usage:       "Define the depth of the docker-compose file search",
-							Value:       6,
+							Value:       4,
 							Destination: &depth,
 						},
 					},
@@ -461,7 +461,7 @@ func commands() []cli.Command {
 						cli.IntFlag{
 							Name:        "depth",
 							Usage:       "Define the depth of the docker-compose file search",
-							Value:       6,
+							Value:       4,
 							Destination: &depth,
 						},
 					},
@@ -481,7 +481,7 @@ func commands() []cli.Command {
 						cli.IntFlag{
 							Name:        "depth",
 							Usage:       "Define the depth of the docker-compose file search",
-							Value:       6,
+							Value:       4,
 							Destination: &depth,
 						},
 					},
@@ -501,7 +501,7 @@ func commands() []cli.Command {
 						cli.IntFlag{
 							Name:        "depth",
 							Usage:       "Define the depth of the docker-compose file search",
-							Value:       6,
+							Value:       4,
 							Destination: &depth,
 						},
 					},
@@ -521,7 +521,7 @@ func commands() []cli.Command {
 						cli.IntFlag{
 							Name:        "depth",
 							Usage:       "Define the depth of the docker-compose file search",
-							Value:       6,
+							Value:       4,
 							Destination: &depth,
 						},
 					},
@@ -541,7 +541,7 @@ func commands() []cli.Command {
 						cli.IntFlag{
 							Name:        "depth",
 							Usage:       "Define the depth of the docker-compose file search",
-							Value:       6,
+							Value:       4,
 							Destination: &depth,
 						},
 					},
@@ -561,7 +561,7 @@ func commands() []cli.Command {
 						cli.IntFlag{
 							Name:        "depth",
 							Usage:       "Define the depth of the docker-compose file search",
-							Value:       6,
+							Value:       4,
 							Destination: &depth,
 						},
 					},
