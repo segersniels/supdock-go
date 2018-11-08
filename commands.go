@@ -9,6 +9,8 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+const DEFAULT_DEPTH = 3
+
 func extractNames(commands []cli.Command) []string {
 	var names []string
 	for _, command := range commands {
@@ -82,6 +84,27 @@ func commands() []cli.Command {
 				}
 				return nil
 			},
+			Subcommands: []cli.Command{
+				{
+					Name:  "all",
+					Usage: "Restart all running containers",
+					Action: func(c *cli.Context) error {
+						var wg sync.WaitGroup
+
+						if psIds == nil {
+							log.Fatal("No containers found to restart")
+						}
+
+						for _, id := range psIds {
+							wg.Add(1)
+							go restartParallel(id, &wg)
+						}
+
+						wg.Wait()
+						return nil
+					},
+				},
+			},
 		},
 		{
 			Name:  "start",
@@ -130,7 +153,7 @@ func commands() []cli.Command {
 			Action: func(c *cli.Context) error {
 				if len(c.Args()) == 0 && c.NumFlags() == 0 {
 					if psIds == nil {
-						log.Fatal("No containers found to start")
+						log.Fatal("No containers found to stop")
 					}
 					id := selectID(psIds, psNames, "Which container would you like to stop?")
 					stop(id)
@@ -147,7 +170,7 @@ func commands() []cli.Command {
 						var wg sync.WaitGroup
 
 						if psIds == nil {
-							log.Fatal("No containers found to start")
+							log.Fatal("No containers found to stop")
 						}
 
 						for _, id := range psIds {
@@ -202,6 +225,27 @@ func commands() []cli.Command {
 					passThroughDocker()
 				}
 				return nil
+			},
+			Subcommands: []cli.Command{
+				{
+					Name:  "all",
+					Usage: "Remove all stopped containers",
+					Action: func(c *cli.Context) error {
+						var wg sync.WaitGroup
+
+						if psaIds == nil {
+							log.Fatal("No containers found to remove")
+						}
+
+						for _, id := range psaIds {
+							wg.Add(1)
+							go removeParallel("container", id, &wg)
+						}
+
+						wg.Wait()
+						return nil
+					},
+				},
 			},
 		},
 		{
@@ -360,16 +404,12 @@ func commands() []cli.Command {
 						cli.IntFlag{
 							Name:        "depth",
 							Usage:       "Define the depth of the docker-compose file search",
-							Value:       6,
+							Value:       DEFAULT_DEPTH,
 							Destination: &depth,
 						},
 					},
 					Action: func(c *cli.Context) error {
-						if len(c.Args()) == 0 && c.NumFlags() == 0 {
-							executeCompose("build", "Which project would you like to build?")
-						} else {
-							passThroughCompose()
-						}
+						executeCompose("build", "Which project would you like to build?")
 						return nil
 					},
 				},
@@ -380,16 +420,12 @@ func commands() []cli.Command {
 						cli.IntFlag{
 							Name:        "depth",
 							Usage:       "Define the depth of the docker-compose file search",
-							Value:       4,
+							Value:       DEFAULT_DEPTH,
 							Destination: &depth,
 						},
 					},
 					Action: func(c *cli.Context) error {
-						if len(c.Args()) == 0 && c.NumFlags() == 0 {
-							executeCompose("restart", "Which project would you like to restart?")
-						} else {
-							passThroughCompose()
-						}
+						executeCompose("restart", "Which project would you like to restart?")
 						return nil
 					},
 				},
@@ -400,16 +436,12 @@ func commands() []cli.Command {
 						cli.IntFlag{
 							Name:        "depth",
 							Usage:       "Define the depth of the docker-compose file search",
-							Value:       4,
+							Value:       DEFAULT_DEPTH,
 							Destination: &depth,
 						},
 					},
 					Action: func(c *cli.Context) error {
-						if len(c.Args()) == 0 && c.NumFlags() == 0 {
-							executeCompose("pull", "Which project would you like to pull the images from?")
-						} else {
-							passThroughCompose()
-						}
+						executeCompose("pull", "Which project would you like to pull the images from?")
 						return nil
 					},
 				},
@@ -420,16 +452,12 @@ func commands() []cli.Command {
 						cli.IntFlag{
 							Name:        "depth",
 							Usage:       "Define the depth of the docker-compose file search",
-							Value:       4,
+							Value:       DEFAULT_DEPTH,
 							Destination: &depth,
 						},
 					},
 					Action: func(c *cli.Context) error {
-						if len(c.Args()) == 0 && c.NumFlags() == 0 {
-							executeCompose("start", "Which project would you like to start?")
-						} else {
-							passThroughCompose()
-						}
+						executeCompose("start", "Which project would you like to start?")
 						return nil
 					},
 				},
@@ -444,19 +472,15 @@ func commands() []cli.Command {
 						cli.IntFlag{
 							Name:        "depth",
 							Usage:       "Define the depth of the docker-compose file search",
-							Value:       4,
+							Value:       DEFAULT_DEPTH,
 							Destination: &depth,
 						},
 					},
 					Action: func(c *cli.Context) error {
-						if len(c.Args()) == 0 {
-							if c.Bool("d") {
-								executeCompose("up-detached", "Which project would you like to start?")
-							} else {
-								executeCompose("up", "Which project would you like to start?")
-							}
+						if c.Bool("d") {
+							executeCompose("up-detached", "Which project would you like to start?")
 						} else {
-							passThroughCompose()
+							executeCompose("up", "Which project would you like to start?")
 						}
 						return nil
 					},
@@ -468,16 +492,12 @@ func commands() []cli.Command {
 						cli.IntFlag{
 							Name:        "depth",
 							Usage:       "Define the depth of the docker-compose file search",
-							Value:       4,
+							Value:       DEFAULT_DEPTH,
 							Destination: &depth,
 						},
 					},
 					Action: func(c *cli.Context) error {
-						if len(c.Args()) == 0 && c.NumFlags() == 0 {
-							executeCompose("down", "Which project would you like to bring down?")
-						} else {
-							passThroughCompose()
-						}
+						executeCompose("down", "Which project would you like to bring down?")
 						return nil
 					},
 				},
@@ -488,16 +508,12 @@ func commands() []cli.Command {
 						cli.IntFlag{
 							Name:        "depth",
 							Usage:       "Define the depth of the docker-compose file search",
-							Value:       4,
+							Value:       DEFAULT_DEPTH,
 							Destination: &depth,
 						},
 					},
 					Action: func(c *cli.Context) error {
-						if len(c.Args()) == 0 && c.NumFlags() == 0 {
-							executeCompose("stop", "Which project would you like to stop?")
-						} else {
-							passThroughCompose()
-						}
+						executeCompose("stop", "Which project would you like to stop?")
 						return nil
 					},
 				},
@@ -508,16 +524,12 @@ func commands() []cli.Command {
 						cli.IntFlag{
 							Name:        "depth",
 							Usage:       "Define the depth of the docker-compose file search",
-							Value:       4,
+							Value:       DEFAULT_DEPTH,
 							Destination: &depth,
 						},
 					},
 					Action: func(c *cli.Context) error {
-						if len(c.Args()) == 0 && c.NumFlags() == 0 {
-							executeCompose("top", "Which project would you like to see the running processes of?")
-						} else {
-							passThroughCompose()
-						}
+						executeCompose("top", "Which project would you like to see the running processes of?")
 						return nil
 					},
 				},
@@ -528,16 +540,12 @@ func commands() []cli.Command {
 						cli.IntFlag{
 							Name:        "depth",
 							Usage:       "Define the depth of the docker-compose file search",
-							Value:       4,
+							Value:       DEFAULT_DEPTH,
 							Destination: &depth,
 						},
 					},
 					Action: func(c *cli.Context) error {
-						if len(c.Args()) == 0 && c.NumFlags() == 0 {
-							executeCompose("logs", "Which project would you like to see the logs of?")
-						} else {
-							passThroughCompose()
-						}
+						executeCompose("logs", "Which project would you like to see the logs of?")
 						return nil
 					},
 				},
@@ -548,16 +556,12 @@ func commands() []cli.Command {
 						cli.IntFlag{
 							Name:        "depth",
 							Usage:       "Define the depth of the docker-compose file search",
-							Value:       4,
+							Value:       DEFAULT_DEPTH,
 							Destination: &depth,
 						},
 					},
 					Action: func(c *cli.Context) error {
-						if len(c.Args()) == 0 && c.NumFlags() == 0 {
-							executeCompose("ps", "Which project would you like to see the running processes of?")
-						} else {
-							passThroughCompose()
-						}
+						executeCompose("ps", "Which project would you like to see the running processes of?")
 						return nil
 					},
 				},
@@ -568,7 +572,7 @@ func commands() []cli.Command {
 						cli.IntFlag{
 							Name:        "depth",
 							Usage:       "Define the depth of the docker-compose file search",
-							Value:       4,
+							Value:       DEFAULT_DEPTH,
 							Destination: &depth,
 						},
 					},

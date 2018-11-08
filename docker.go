@@ -38,8 +38,34 @@ func stopParallel(id string, wg *sync.WaitGroup) {
 	fmt.Println(id)
 }
 
+func restartParallel(id string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	err := docker.ContainerRestart(context.Background(), id, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(id)
+}
+
 func restart(id string) {
 	err := docker.ContainerRestart(context.Background(), id, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(id)
+}
+
+func removeParallel(removeType string, id string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	var err error
+	switch removeType {
+	case "container":
+		err = docker.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions{})
+	case "image":
+		_, err = docker.ImageRemove(context.Background(), id, types.ImageRemoveOptions{})
+	case "image-force":
+		_, err = docker.ImageRemove(context.Background(), id, types.ImageRemoveOptions{Force: true})
+	}
 	if err != nil {
 		log.Fatal(err)
 	}
