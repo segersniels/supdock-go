@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 
 	"github.com/docker/docker/api/types"
 	log "github.com/sirupsen/logrus"
@@ -21,6 +22,15 @@ func start(id string) {
 }
 
 func stop(id string) {
+	err := docker.ContainerStop(context.Background(), id, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(id)
+}
+
+func stopParallel(id string, wg *sync.WaitGroup) {
+	defer wg.Done()
 	err := docker.ContainerStop(context.Background(), id, nil)
 	if err != nil {
 		log.Fatal(err)

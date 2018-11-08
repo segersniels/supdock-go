@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sync"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
@@ -143,12 +144,18 @@ func commands() []cli.Command {
 					Name:  "all",
 					Usage: "Stop all running containers",
 					Action: func(c *cli.Context) error {
+						var wg sync.WaitGroup
+
 						if psIds == nil {
 							log.Fatal("No containers found to start")
 						}
+
 						for _, id := range psIds {
-							stop(id)
+							wg.Add(1)
+							go stopParallel(id, &wg)
 						}
+
+						wg.Wait()
 						return nil
 					},
 				},
