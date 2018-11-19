@@ -63,7 +63,7 @@ func executeCompose(command string, question string) {
 }
 
 func passThroughCompose() {
-	cmd := exec.Command("docker-compose", os.Args[1:]...)
+	cmd := exec.Command("docker-compose", os.Args[2:]...)
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
 	cmd.Stdin = os.Stdin

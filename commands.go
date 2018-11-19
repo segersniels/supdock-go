@@ -409,7 +409,11 @@ func commands() []cli.Command {
 						},
 					},
 					Action: func(c *cli.Context) error {
-						executeCompose("build", "Which project would you like to build?")
+						if len(c.Args()) == 0 {
+							executeCompose("build", "Which project would you like to build?")
+						} else {
+							passThroughCompose()
+						}
 						return nil
 					},
 				},
@@ -425,7 +429,11 @@ func commands() []cli.Command {
 						},
 					},
 					Action: func(c *cli.Context) error {
-						executeCompose("restart", "Which project would you like to restart?")
+						if len(c.Args()) == 0 {
+							executeCompose("restart", "Which project would you like to restart?")
+						} else {
+							passThroughCompose()
+						}
 						return nil
 					},
 				},
@@ -441,7 +449,11 @@ func commands() []cli.Command {
 						},
 					},
 					Action: func(c *cli.Context) error {
-						executeCompose("pull", "Which project would you like to pull the images from?")
+						if len(c.Args()) == 0 {
+							executeCompose("pull", "Which project would you like to pull the images from?")
+						} else {
+							passThroughCompose()
+						}
 						return nil
 					},
 				},
@@ -457,7 +469,11 @@ func commands() []cli.Command {
 						},
 					},
 					Action: func(c *cli.Context) error {
-						executeCompose("start", "Which project would you like to start?")
+						if len(c.Args()) == 0 {
+							executeCompose("start", "Which project would you like to start?")
+						} else {
+							passThroughCompose()
+						}
 						return nil
 					},
 				},
@@ -477,10 +493,14 @@ func commands() []cli.Command {
 						},
 					},
 					Action: func(c *cli.Context) error {
-						if c.Bool("d") {
-							executeCompose("up-detached", "Which project would you like to start?")
+						if len(c.Args()) == 0 {
+							if c.Bool("d") {
+								executeCompose("up-detached", "Which project would you like to start?")
+							} else {
+								executeCompose("up", "Which project would you like to start?")
+							}
 						} else {
-							executeCompose("up", "Which project would you like to start?")
+							passThroughCompose()
 						}
 						return nil
 					},
@@ -497,7 +517,11 @@ func commands() []cli.Command {
 						},
 					},
 					Action: func(c *cli.Context) error {
-						executeCompose("down", "Which project would you like to bring down?")
+						if len(c.Args()) == 0 {
+							executeCompose("down", "Which project would you like to bring down?")
+						} else {
+							passThroughCompose()
+						}
 						return nil
 					},
 				},
@@ -513,7 +537,11 @@ func commands() []cli.Command {
 						},
 					},
 					Action: func(c *cli.Context) error {
-						executeCompose("stop", "Which project would you like to stop?")
+						if len(c.Args()) == 0 {
+							executeCompose("stop", "Which project would you like to stop?")
+						} else {
+							passThroughCompose()
+						}
 						return nil
 					},
 				},
@@ -529,7 +557,11 @@ func commands() []cli.Command {
 						},
 					},
 					Action: func(c *cli.Context) error {
-						executeCompose("top", "Which project would you like to see the running processes of?")
+						if len(c.Args()) == 0 {
+							executeCompose("top", "Which project would you like to see the running processes of?")
+						} else {
+							passThroughCompose()
+						}
 						return nil
 					},
 				},
@@ -545,7 +577,11 @@ func commands() []cli.Command {
 						},
 					},
 					Action: func(c *cli.Context) error {
-						executeCompose("logs", "Which project would you like to see the logs of?")
+						if len(c.Args()) == 0 {
+							executeCompose("logs", "Which project would you like to see the logs of?")
+						} else {
+							passThroughCompose()
+						}
 						return nil
 					},
 				},
@@ -561,7 +597,11 @@ func commands() []cli.Command {
 						},
 					},
 					Action: func(c *cli.Context) error {
-						executeCompose("ps", "Which project would you like to see the running processes of?")
+						if len(c.Args()) == 0 {
+							executeCompose("ps", "Which project would you like to see the running processes of?")
+						} else {
+							passThroughCompose()
+						}
 						return nil
 					},
 				},
