@@ -37,7 +37,7 @@ USAGE:
    supdock [global options] command [command options] [arguments...]
 
 VERSION:
-   0.2.1
+   0.2.3
 
 COMMANDS:
      logs     See the logs of a container

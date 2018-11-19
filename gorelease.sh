@@ -6,8 +6,8 @@ if [[ `git tag -l $version` == $version ]]; then
 else
     go get github.com/goreleaser/goreleaser
     echo "Tagging new version $version"
-    git config --global user.email "segers.n@hotmail.com"
-    git config --global user.name "segersniels"
+    git config --global user.email "$GITHUB_EMAIL"
+    git config --global user.name "$GITHUB_USERNAME"
     git tag -a "$version" -m "$message"
     git push origin "$version"
     goreleaser release --skip-validate
